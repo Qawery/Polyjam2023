@@ -1,10 +1,10 @@
 namespace Polyjam2023
 {
-    public class CardLogic
+    public class CardLogicData
     {
         public string name;
 
-        public CardLogic(string name)
+        public CardLogicData(string name)
         {
             this.name = name;
         }

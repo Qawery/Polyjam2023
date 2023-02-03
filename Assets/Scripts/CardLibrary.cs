@@ -16,14 +16,14 @@ namespace Polyjam2023
             GenerateCardsData();
         }
 
-        public CardLogic GetCardLogic(string name)
+        public CardLogicData GetCardLogic(string name)
         {
             if (cardEntriesByName == null)
             {
                 GenerateCardsData();
             }
             Assert.IsTrue(cardEntriesByName.TryGetValue(name, out var cardEntry), $"No data for card name <{name}>.");
-            return new CardLogic(cardEntry.name);
+            return new CardLogicData(cardEntry.name);
         }
 
         public CardPresentationData GetCardPresentationData(string name)

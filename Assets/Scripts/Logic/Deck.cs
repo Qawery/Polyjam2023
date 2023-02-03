@@ -5,28 +5,28 @@ namespace Polyjam2023
 {
     public class Deck
     {
-        private Stack<CardLogic> cards = new ();
+        private Stack<CardLogicData> cards = new ();
 
         public event System.Action OnChanged;
         
         public int NumberOfCardsInDeck => cards.Count;
 
-        public void AddCards(ICollection<CardLogic> cards)
+        public void AddCards(ICollection<CardLogicData> cardsToAdd)
         {
-            foreach(var card in cards)
+            foreach(var card in cardsToAdd)
             {
-                this.cards.Push(card);
+                cards.Push(card);
             }
             OnChanged?.Invoke();
         }
 
-        public List<CardLogic> TakeCards(int number)
+        public List<CardLogicData> TakeCards(int numberOfCards)
         {
-            var result = new List<CardLogic>();
-            while (number > 0 && NumberOfCardsInDeck > 0)
+            var result = new List<CardLogicData>();
+            while (numberOfCards > 0 && NumberOfCardsInDeck > 0)
             {
                 result.Add(cards.Pop());
-                --number;
+                --numberOfCards;
             }
             OnChanged?.Invoke();
             return result;
@@ -34,7 +34,7 @@ namespace Polyjam2023
 
         public void Shuffle()
         {
-            var cardList = new List<CardLogic>();
+            var cardList = new List<CardLogicData>();
             foreach(var card in cards)
             {
                 cardList.Add(card);

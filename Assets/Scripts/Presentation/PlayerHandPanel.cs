@@ -3,7 +3,7 @@ using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
-    public class CardPresentationManager : MonoBehaviour
+    public class PlayerHandPanel : MonoBehaviour
     {
         [SerializeField] private CardLibrary cardLibrary;
         [SerializeField] private GameplayManager gameplayManager;
@@ -16,23 +16,27 @@ namespace Polyjam2023
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(cardWidgetPrefab, $"Missing {nameof(cardWidgetPrefab)} on {gameObject.name}.");
             Assert.IsNotNull(handContainer, $"Missing {nameof(handContainer)} on {gameObject.name}.");
-            while (handContainer.childCount > 0)
-            {
-                DestroyImmediate(handContainer.GetChild(0).gameObject);
-            }
+
+            gameplayManager.GameState.PlayerHand.OnChanged += OnPlayerHandChanged;
+            OnPlayerHandChanged();
         }
 
         private void OnDestroy()
         {
+            gameplayManager.GameState.PlayerHand.OnChanged -= OnPlayerHandChanged;
             cardLibrary = null;
             gameplayManager = null;
             cardWidgetPrefab = null;
             handContainer = null;
         }
 
-        private void Start()
+        private void OnPlayerHandChanged()
         {
-            foreach (var cardInHand in gameplayManager.GameState.PlayerHand)
+            while (handContainer.childCount > 0)
+            {
+                DestroyImmediate(handContainer.GetChild(0).gameObject);
+            }
+            foreach (var cardInHand in gameplayManager.GameState.PlayerHand.Cards)
             {
                 var newCardPresentation = Instantiate(cardWidgetPrefab, handContainer);
                 newCardPresentation.SetPresentationData(cardLibrary.GetCardPresentationData(cardInHand.name));
