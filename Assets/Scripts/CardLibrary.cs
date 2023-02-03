@@ -32,7 +32,7 @@ namespace Polyjam2023
             {
                 GenerateCardsData();
             }
-            Assert.IsTrue(cardEntriesByName.TryGetValue(name, out var cardEntry), $"No data for card name <{name}>.");
+            Assert.IsTrue(cardEntriesByName.TryGetValue(name, out var cardEntry), $"No data in library for card name <{name}>.");
             return new CardPresentationData(cardEntry.name, cardEntry.image, cardEntry.description);
         }
 
