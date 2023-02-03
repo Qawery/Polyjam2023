@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -8,15 +9,32 @@ namespace Polyjam2023
         [SerializeField] private CardLibrary cardLibrary;
         [SerializeField] private GameplayManager gameplayManager;
         [SerializeField] private CardWidget cardWidgetPrefab;
-        [SerializeField] private RectTransform handContainer;
+        [SerializeField] private RectTransform cardWidgetsContainer;
+        private List<CardWidget> cardWidgets = new();
 
         private void Awake()
         {
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(cardWidgetPrefab, $"Missing {nameof(cardWidgetPrefab)} on {gameObject.name}.");
-            Assert.IsNotNull(handContainer, $"Missing {nameof(handContainer)} on {gameObject.name}.");
+            Assert.IsNotNull(cardWidgetsContainer, $"Missing {nameof(cardWidgetsContainer)} on {gameObject.name}.");
 
+            int childIndex = 0;
+            for (; childIndex < cardWidgetsContainer.childCount;)
+            {
+                var cardWidget = cardWidgetsContainer.GetChild(0).GetComponent<CardWidget>();
+                if (cardWidget == null)
+                {
+                    DestroyImmediate(cardWidgetsContainer.GetChild(0).gameObject);
+                }
+                else
+                {
+                    cardWidgets.Add(cardWidget);
+                    cardWidget.OnClicked += () => { gameplayManager.PlayPlayerCard(cardWidget.CardName); };
+                    ++childIndex;
+                }
+            }
+            
             gameplayManager.GameState.PlayerHand.OnChanged += OnPlayerHandChanged;
             OnPlayerHandChanged();
         }
@@ -27,19 +45,30 @@ namespace Polyjam2023
             cardLibrary = null;
             gameplayManager = null;
             cardWidgetPrefab = null;
-            handContainer = null;
+            cardWidgetsContainer = null;
+            cardWidgets.Clear();
         }
 
         private void OnPlayerHandChanged()
         {
-            while (handContainer.childCount > 0)
+            while (cardWidgets.Count > gameplayManager.GameState.PlayerHand.Cards.Count)
             {
-                DestroyImmediate(handContainer.GetChild(0).gameObject);
+                Destroy(cardWidgets[0].gameObject);
+                cardWidgets.RemoveAt(0);
             }
-            foreach (var cardInHand in gameplayManager.GameState.PlayerHand.Cards)
+            
+            while (cardWidgets.Count < gameplayManager.GameState.PlayerHand.Cards.Count)
             {
-                var newCardPresentation = Instantiate(cardWidgetPrefab, handContainer);
-                newCardPresentation.SetPresentationData(cardLibrary.GetCardPresentationData(cardInHand.name));
+                var newCardWidget = Instantiate(cardWidgetPrefab, cardWidgetsContainer);
+                cardWidgets.Add(newCardWidget);
+                newCardWidget.OnClicked += () => { gameplayManager.PlayPlayerCard(newCardWidget.CardName); };
+            }
+
+            int i = 0;
+            foreach (var cardEntry in gameplayManager.GameState.PlayerHand.Cards)
+            {
+                cardWidgets[i].SetPresentationData(cardLibrary.GetCardPresentationData(cardEntry.name), cardEntry.quantity);
+                ++i;
             }
         }
     }

@@ -6,6 +6,6 @@ namespace Polyjam2023
     {
         public abstract string CardName { get; }
 
-        public abstract void PlayCard(GameState gameState);
+        public abstract bool TryPlayCard(GameState gameState);
     }
 }

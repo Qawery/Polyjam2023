@@ -1,31 +1,41 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
     public class GameplayManager : MonoBehaviour
     {
-        private float delay = 5.0f;
+        [SerializeField] private CardLibrary cardLibrary;
+        private float delay = 2.0f;
+        
         public GameState GameState { get; private set; } = new ();
+
+        private void Awake()
+        {
+            Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
+            GameState.PlayerDeck.AddCards(new List<string>
+            {
+                "Test Card 1", "Test Card 1", "Test Card 1", "Test Card 1",
+                "Test Card 2", "Test Card 2", "Test Card 2", "Test Card 2"
+            });
+            GameState.PlayerDeck.Shuffle();
+            GameState.PlayerDeck.AddCards(new List<string>
+            {
+                "Test Card 3"
+            });
+        }
 
         private void Start()
         {
-            GameState.PlayerDeck.AddCards(new List<CardLogicData>{new ("Test Card 1"), new ("Test Card 1"), 
-                                                                new ("Test Card 1"), new ("Test Card 1"), 
-                                                                new ("Test Card 2"), new ("Test Card 2"), 
-                                                                new ("Test Card 2"), new ("Test Card 2")});
-            GameState.PlayerDeck.Shuffle();
+            GameState.PlayerHand.AddCard("Test Card 3");
         }
 
-        private void Update()
+        public void PlayPlayerCard(string cardName)
         {
-            if (delay > 0.0f)
+            if (cardLibrary.GetCardLogic(cardName).TryPlayCard(GameState))
             {
-                delay -= Time.deltaTime;
-                if (delay <= 0.0f)
-                {
-                    GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(GameState.PlayerDeck.NumberOfCardsInDeck));
-                }
+                GameState.PlayerHand.RemoveCard(cardName);
             }
         }
     }

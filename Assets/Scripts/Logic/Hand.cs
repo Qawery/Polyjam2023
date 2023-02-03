@@ -1,36 +1,68 @@
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
     public class Hand
     {
-        private List<CardLogicData> cards = new ();
+        private List<(string name, int quantity)> cards = new ();
 
         public event System.Action OnChanged;
         
-        public IReadOnlyList<CardLogicData> Cards => cards;
+        public IReadOnlyList<(string name, int quantity)> Cards => cards;
 
-        public void AddCards(ICollection<CardLogicData> cardsToAdd)
+        public void AddCard(string cardToAdd)
         {
-            cards.AddRange(cardsToAdd);
-            OnChanged?.Invoke();
+            AddCards(new List<string>{cardToAdd});
         }
-        
-        public void RemoveCards(ICollection<CardLogicData> cardsToRemove)
+
+        public void AddCards(ICollection<string> cardsToAdd)
         {
-            foreach (var cardToRemove in cardsToRemove)
+            foreach (var cardToAdd in cardsToAdd)
             {
-                int i = 0;
-                for (; i < cards.Count; ++i)
+                bool entryNotFound = true;
+                for (int i = 0; i < cards.Count; ++i)
                 {
-                    if (cards[i].name == cardToRemove.name)
+                    var previousEntry = cards[i];
+                    if (previousEntry.name == cardToAdd)
                     {
                         cards.RemoveAt(i);
+                        cards.Insert(i, (previousEntry.name, previousEntry.quantity + 1));
+                        entryNotFound = false;
                         break;
                     }
                 }
+
+                if (entryNotFound)
+                {
+                    cards.Add((cardToAdd, 1));
+                }
             }
+
+            cards = cards.OrderBy(card => card.name).ToList();
+            
             OnChanged?.Invoke();
+        }
+        
+        public void RemoveCard(string cardName)
+        {
+            for (int i = 0; i < cards.Count; ++i)
+            {
+                var previousEntry = cards[i];
+                if (previousEntry.name == cardName)
+                {
+                    cards.RemoveAt(i);
+                    if (previousEntry.quantity > 1)
+                    {
+                        cards.Insert(i, (previousEntry.name, previousEntry.quantity - 1));
+                    }
+                    OnChanged?.Invoke();
+                    return;
+                }
+            }
+            
+            Assert.IsFalse(true, $"Card to remove <{cardName}> not present on hand.");
         }
     }
 }
