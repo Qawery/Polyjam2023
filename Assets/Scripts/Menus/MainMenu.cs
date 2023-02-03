@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Polyjam2023
@@ -18,7 +19,7 @@ namespace Polyjam2023
             base.Awake();
             
             Assert.IsNotNull(newGameButton, $"Missing {nameof(newGameButton)} on {gameObject.name}.");
-            newGameButton.onClick.AddListener(() => { LoadingScreen.Instance.LoadScene("Gameplay"); });
+            newGameButton.onClick.AddListener(() => { SceneManager.LoadScene("Gameplay"); });
             
             Assert.IsNotNull(howToPlayButton, $"Missing {nameof(howToPlayButton)} on {gameObject.name}.");
             Assert.IsNotNull(howToPlayPanel, $"Missing {nameof(howToPlayPanel)} on {gameObject.name}.");

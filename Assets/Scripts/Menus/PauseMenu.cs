@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 namespace Polyjam2023
@@ -26,7 +27,7 @@ namespace Polyjam2023
             creditsButton.onClick.AddListener(() => { InvokeOnRequestTransitionToPanel(creditsPanel); });
             
             Assert.IsNotNull(returnToMainMenuButton, $"Missing {nameof(returnToMainMenuButton)} on {gameObject.name}.");
-            returnToMainMenuButton.onClick.AddListener(() => { LoadingScreen.Instance.LoadScene("MainMenu");} );
+            returnToMainMenuButton.onClick.AddListener(() => { SceneManager.LoadScene("MainMenu"); } );
         }
 
         protected override void OnDestroy()

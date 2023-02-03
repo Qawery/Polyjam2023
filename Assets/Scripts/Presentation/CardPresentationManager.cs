@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Assertions;
-using UnityEngine.Serialization;
 
 namespace Polyjam2023
 {
@@ -8,7 +7,7 @@ namespace Polyjam2023
     {
         [SerializeField] private CardLibrary cardLibrary;
         [SerializeField] private GameplayManager gameplayManager;
-        [FormerlySerializedAs("cardViewPrefab")] [FormerlySerializedAs("cardPresentationPrefab")] [SerializeField] private CardWidget cardWidgetPrefab;
+        [SerializeField] private CardWidget cardWidgetPrefab;
         [SerializeField] private RectTransform handContainer;
 
         private void Awake()

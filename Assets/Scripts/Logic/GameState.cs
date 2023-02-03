@@ -4,16 +4,11 @@ namespace Polyjam2023
 {
     public class GameState
     {
-        private List<CardLogic> playerDeck = new (){new CardLogic("Test Card"), new CardLogic("Test Card"), 
-                                                    new CardLogic("Test Card"), new CardLogic("Test Card"), 
-                                                    new CardLogic("Test Card"), new CardLogic("Test Card"), 
-                                                    new CardLogic("Test Card"), new CardLogic("Test Card"), 
-                                                    new CardLogic("Test Card"), new CardLogic("Test Card")};
+        private Deck playerDeck = new ();
         
-        private List<CardLogic> playerHand = new (){new CardLogic("Test Card")};
-        
-        public IReadOnlyList<CardLogic> PlayerHand => playerHand;
+        private List<CardLogic> playerHand = new (){new CardLogic("Test Card 3")};
 
-        public int NumberOfCardsInDeck => playerDeck.Count;
+        public Deck PlayerDeck => playerDeck;
+        public IReadOnlyList<CardLogic> PlayerHand => playerHand;
     }
 }
