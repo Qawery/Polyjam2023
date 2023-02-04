@@ -15,11 +15,12 @@ namespace Polyjam2023
         private void Awake()
         {
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
-            gameplayManager.GameState.PlayerDeck.OnChanged += OnDeckChanged;
             Assert.IsNotNull(cardsCounter, $"Missing {nameof(cardsCounter)} on {gameObject.name}.");
             Assert.IsNotNull(deckImage, $"Missing {nameof(deckImage)} on {gameObject.name}.");
             Assert.IsNotNull(cardsPresentImage, $"Missing {nameof(cardsPresentImage)} on {gameObject.name}.");
             Assert.IsNotNull(cardsAbsentImage, $"Missing {nameof(cardsAbsentImage)} on {gameObject.name}.");
+            
+            gameplayManager.GameState.PlayerDeck.OnChanged += OnDeckChanged;
             OnDeckChanged();
         }
 

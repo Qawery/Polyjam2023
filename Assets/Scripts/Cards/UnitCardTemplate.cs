@@ -9,7 +9,7 @@ namespace Polyjam2023
 
         public override bool TryPlayCard(GameState gameState)
         {
-            gameState.Field.AddUnit(new UnitInstance(this));
+            gameState.Field.AddPlayerUnit(new UnitInstance(this));
             return true;
         }
     }

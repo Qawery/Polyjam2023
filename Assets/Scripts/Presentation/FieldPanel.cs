@@ -9,63 +9,90 @@ namespace Polyjam2023
         [SerializeField] private CardLibrary cardLibrary;
         [SerializeField] private GameplayManager gameplayManager;
         [SerializeField] private UnitWidget unitWidgetPrefab;
-        [SerializeField] private RectTransform unitWidgetsContainer;
-        private List<UnitWidget> unitWidgets = new();
+        [SerializeField] private RectTransform enemyUnitWidgetsContainer;
+        [SerializeField] private RectTransform playerUnitWidgetsContainer;
+        private List<UnitWidget> enemyUnitWidgets = new();
+        private List<UnitWidget> playerUnitWidgets = new();
 
         private void Awake()
         {
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(unitWidgetPrefab, $"Missing {nameof(unitWidgetPrefab)} on {gameObject.name}.");
-            Assert.IsNotNull(unitWidgetsContainer, $"Missing {nameof(unitWidgetsContainer)} on {gameObject.name}.");
+            Assert.IsNotNull(enemyUnitWidgetsContainer, $"Missing {nameof(enemyUnitWidgetsContainer)} on {gameObject.name}.");
+            Assert.IsNotNull(playerUnitWidgetsContainer, $"Missing {nameof(playerUnitWidgetsContainer)} on {gameObject.name}.");
 
-            int childIndex = 0;
-            for (; childIndex < unitWidgetsContainer.childCount;)
-            {
-                var unitWidget = unitWidgetsContainer.GetChild(0).GetComponent<UnitWidget>();
-                if (unitWidget == null)
-                {
-                    DestroyImmediate(unitWidgetsContainer.GetChild(0).gameObject);
-                }
-                else
-                {
-                    unitWidgets.Add(unitWidget);
-                    ++childIndex;
-                }
-            }
+            CleanupPresentWidgets(enemyUnitWidgetsContainer, ref enemyUnitWidgets);
+            CleanupPresentWidgets(playerUnitWidgetsContainer, ref playerUnitWidgets);
             
-            gameplayManager.GameState.Field.OnChanged += OnFieldChanged;
-            OnFieldChanged();
+            gameplayManager.GameState.Field.OnEnemyUnitsChanged += OnEnemyUnitsChanged;
+            gameplayManager.GameState.Field.OnPlayerUnitsChanged += OnPlayerUnitsChanged;
+            
+            OnEnemyUnitsChanged();
+            OnPlayerUnitsChanged();
         }
 
         private void OnDestroy()
         {
-            gameplayManager.GameState.PlayerHand.OnChanged -= OnFieldChanged;
+            gameplayManager.GameState.Field.OnEnemyUnitsChanged -= OnEnemyUnitsChanged;
+            gameplayManager.GameState.Field.OnPlayerUnitsChanged -= OnPlayerUnitsChanged;
             cardLibrary = null;
             gameplayManager = null;
             unitWidgetPrefab = null;
-            unitWidgetsContainer = null;
-            unitWidgets.Clear();
+            enemyUnitWidgetsContainer = null;
+            playerUnitWidgetsContainer = null;
+            enemyUnitWidgets.Clear();
+            playerUnitWidgets.Clear();
         }
 
-        private void OnFieldChanged()
+        private void CleanupPresentWidgets(RectTransform widgetContainer, ref List<UnitWidget> widgetCollection)
         {
-            while (unitWidgets.Count > gameplayManager.GameState.Field.UnitsPresent.Count)
+            int childIndex = 0;
+            for (; childIndex < widgetContainer.childCount;)
             {
-                Destroy(unitWidgets[0].gameObject);
-                unitWidgets.RemoveAt(0);
+                var unitWidget = widgetContainer.GetChild(0).GetComponent<UnitWidget>();
+                if (unitWidget == null)
+                {
+                    DestroyImmediate(widgetContainer.GetChild(0).gameObject);
+                }
+                else
+                {
+                    widgetCollection.Add(unitWidget);
+                    ++childIndex;
+                }
+            }
+        }
+        
+        private void OnEnemyUnitsChanged()
+        {
+            var enemyUnitsPresent = gameplayManager.GameState.Field.EnemyUnitsPresent;
+            OnUnitsChanged(ref enemyUnitsPresent, ref enemyUnitWidgetsContainer, ref enemyUnitWidgets);
+        }
+        
+        private void OnPlayerUnitsChanged()
+        {
+            var playerUnitsPresent = gameplayManager.GameState.Field.PlayerUnitsPresent;
+            OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
+        }
+
+        private void OnUnitsChanged(ref IReadOnlyList<UnitInstance> unitsPresent, ref RectTransform widgetContainer, ref List<UnitWidget> widgetCollection)
+        {
+            while (widgetCollection.Count > unitsPresent.Count)
+            {
+                Destroy(widgetCollection[0].gameObject);
+                widgetCollection.RemoveAt(0);
             }
             
-            while (unitWidgets.Count < gameplayManager.GameState.Field.UnitsPresent.Count)
+            while (widgetCollection.Count < unitsPresent.Count)
             {
-                var newUnitWidget = Instantiate(unitWidgetPrefab, unitWidgetsContainer);
-                unitWidgets.Add(newUnitWidget);
+                var newUnitWidget = Instantiate(unitWidgetPrefab, widgetContainer);
+                widgetCollection.Add(newUnitWidget);
             }
 
             int i = 0;
-            foreach (var unitInstance in gameplayManager.GameState.Field.UnitsPresent)
+            foreach (var unitInstance in unitsPresent)
             {
-                unitWidgets[i].SetPresentationData(unitInstance);
+                widgetCollection[i].SetPresentationData(unitInstance);
                 ++i;
             }
         }

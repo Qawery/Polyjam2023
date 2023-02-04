@@ -4,16 +4,25 @@ namespace Polyjam2023
 {
     public class Field
     {
-        private List<UnitInstance> unitsPresent  = new ();
+        private List<UnitInstance> enemyUnitsPresent  = new ();
+        private List<UnitInstance> playerUnitsPresent  = new ();
 
-        public event System.Action OnChanged;
+        public event System.Action OnEnemyUnitsChanged;
+        public event System.Action OnPlayerUnitsChanged;
         
-        public IReadOnlyList<UnitInstance> UnitsPresent => unitsPresent;
+        public IReadOnlyList<UnitInstance> EnemyUnitsPresent => enemyUnitsPresent;
+        public IReadOnlyList<UnitInstance> PlayerUnitsPresent => playerUnitsPresent;
 
-        public void AddUnit(UnitInstance newUnitInstance)
+        public void AddEnemyUnit(UnitInstance newUnitInstance)
         {
-            unitsPresent.Add(newUnitInstance);
-            OnChanged?.Invoke();
+            playerUnitsPresent.Add(newUnitInstance);
+            OnEnemyUnitsChanged?.Invoke();
+        }
+        
+        public void AddPlayerUnit(UnitInstance newUnitInstance)
+        {
+            playerUnitsPresent.Add(newUnitInstance);
+            OnPlayerUnitsChanged?.Invoke();
         }
     }
 }
