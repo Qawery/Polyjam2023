@@ -9,17 +9,17 @@ namespace Polyjam2023
     {
         [Inject] private CardLibrary cardLibrary;
         [Inject] private GameplayManager gameplayManager;
-        [Inject] private UnitWidget unitWidgetPrefab;
+        [Inject] private UnitInstanceWidget unitInstanceWidgetPrefab;
         [SerializeField] private RectTransform enemyUnitWidgetsContainer;
         [SerializeField] private RectTransform playerUnitWidgetsContainer;
-        private List<UnitWidget> enemyUnitWidgets = new ();
-        private List<UnitWidget> playerUnitWidgets = new ();
+        private List<UnitInstanceWidget> enemyUnitWidgets = new ();
+        private List<UnitInstanceWidget> playerUnitWidgets = new ();
 
         private void Awake()
         {
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
-            Assert.IsNotNull(unitWidgetPrefab, $"Missing {nameof(unitWidgetPrefab)} on {gameObject.name}.");
+            Assert.IsNotNull(unitInstanceWidgetPrefab, $"Missing {nameof(unitInstanceWidgetPrefab)} on {gameObject.name}.");
             Assert.IsNotNull(enemyUnitWidgetsContainer, $"Missing {nameof(enemyUnitWidgetsContainer)} on {gameObject.name}.");
             Assert.IsNotNull(playerUnitWidgetsContainer, $"Missing {nameof(playerUnitWidgetsContainer)} on {gameObject.name}.");
 
@@ -39,19 +39,19 @@ namespace Polyjam2023
             gameplayManager.GameState.Field.OnPlayerUnitsChanged -= OnPlayerUnitsChanged;
             cardLibrary = null;
             gameplayManager = null;
-            unitWidgetPrefab = null;
+            unitInstanceWidgetPrefab = null;
             enemyUnitWidgetsContainer = null;
             playerUnitWidgetsContainer = null;
             enemyUnitWidgets.Clear();
             playerUnitWidgets.Clear();
         }
 
-        private void CleanupPresentWidgets(RectTransform widgetContainer, ref List<UnitWidget> widgetCollection)
+        private void CleanupPresentWidgets(RectTransform widgetContainer, ref List<UnitInstanceWidget> widgetCollection)
         {
             int childIndex = 0;
             for (; childIndex < widgetContainer.childCount;)
             {
-                var unitWidget = widgetContainer.GetChild(0).GetComponent<UnitWidget>();
+                var unitWidget = widgetContainer.GetChild(0).GetComponent<UnitInstanceWidget>();
                 if (unitWidget == null)
                 {
                     DestroyImmediate(widgetContainer.GetChild(0).gameObject);
@@ -76,7 +76,7 @@ namespace Polyjam2023
             OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
         }
 
-        private void OnUnitsChanged(ref IReadOnlyList<UnitInstance> unitsPresent, ref RectTransform widgetContainer, ref List<UnitWidget> widgetCollection)
+        private void OnUnitsChanged(ref IReadOnlyList<UnitInstance> unitsPresent, ref RectTransform widgetContainer, ref List<UnitInstanceWidget> widgetCollection)
         {
             while (widgetCollection.Count > unitsPresent.Count)
             {
@@ -86,7 +86,7 @@ namespace Polyjam2023
             
             while (widgetCollection.Count < unitsPresent.Count)
             {
-                var newUnitWidget = Instantiate(unitWidgetPrefab, widgetContainer);
+                var newUnitWidget = Instantiate(unitInstanceWidgetPrefab, widgetContainer);
                 widgetCollection.Add(newUnitWidget);
             }
 
