@@ -8,35 +8,29 @@ namespace Polyjam2023
     [CreateAssetMenu(fileName = "CardLibrary", menuName = "ScriptableObjects/CardLibrary", order = 1)]
     public class CardLibrary : ScriptableObject
     {
-        [SerializeField] private List<CardDescription> cardLibrary = new ();
-        private Dictionary<string, CardDescription> cardDescriptionsByName;
+        [SerializeField] private List<CardTemplate> cardTemplateLibrary = new ();
+        private Dictionary<string, CardTemplate> cardTemplatesByName;
 
         private void OnValidate()
         {
-            cardLibrary = cardLibrary.OrderBy(cardDescription => cardDescription.CardName).ToList();
+            cardTemplateLibrary = cardTemplateLibrary.OrderBy(cardDescription => cardDescription.CardName).ToList();
             
-            cardDescriptionsByName = new();
-            foreach (var cardDescription in cardLibrary)
+            cardTemplatesByName = new();
+            foreach (var cardTemplate in cardTemplateLibrary)
             {
-                Assert.IsNotNull(cardDescription, $"Null {nameof(cardDescription)} in {nameof(cardLibrary)}.");
-                Assert.IsFalse(string.IsNullOrEmpty(cardDescription.CardName), $"Null or empty {nameof(cardDescription.CardName)} in {nameof(cardDescription)}.");
-                Assert.IsNotNull(cardDescription.Image, $"Null {nameof(cardDescription.Image)} on {nameof(cardDescription)}.");
-                Assert.IsFalse(string.IsNullOrEmpty(cardDescription.EffectDescription), $"Null or empty {nameof(cardDescription.EffectDescription)} in {nameof(cardDescription)}.");
-                Assert.IsFalse(cardDescriptionsByName.ContainsKey(cardDescription.CardName), $"Duplicate card name <{cardDescription.CardName}> in library.");
-                cardDescriptionsByName.Add(cardDescription.CardName, cardDescription);
+                Assert.IsNotNull(cardTemplate, $"Null {nameof(cardTemplate)} in {nameof(cardTemplateLibrary)}.");
+                Assert.IsFalse(string.IsNullOrEmpty(cardTemplate.CardName), $"Null or empty {nameof(cardTemplate.CardName)} in {nameof(cardTemplate)}.");
+                Assert.IsNotNull(cardTemplate.Image, $"Null {nameof(cardTemplate.Image)} on {nameof(cardTemplate)}.");
+                Assert.IsFalse(string.IsNullOrEmpty(cardTemplate.EffectDescription), $"Null or empty {nameof(cardTemplate.EffectDescription)} in {nameof(cardTemplate)}.");
+                Assert.IsFalse(cardTemplatesByName.ContainsKey(cardTemplate.CardName), $"Duplicate card name <{cardTemplate.CardName}> in library.");
+                cardTemplatesByName.Add(cardTemplate.CardName, cardTemplate);
             }
         }
 
-        public CardDescription GetCardDescription(string name)
+        public CardTemplate GetCardTemplate(string name)
         {
-            Assert.IsTrue(cardDescriptionsByName.TryGetValue(name, out var cardEntry), $"No data in library for card name <{name}>.");
-            return cardEntry;
-        }
-
-        public CardPresentationData GetCardPresentationData(string name)
-        {
-            Assert.IsTrue(cardDescriptionsByName.TryGetValue(name, out var cardEntry), $"No data in library for card name <{name}>.");
-            return new CardPresentationData(cardEntry.CardName, cardEntry.Image, cardEntry.EffectDescription, cardEntry.FluffDescription);
+            Assert.IsTrue(cardTemplatesByName.TryGetValue(name, out var cardTemplate), $"No data in library for card name <{name}>.");
+            return cardTemplate;
         }
     }
 }

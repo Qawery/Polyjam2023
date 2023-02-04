@@ -35,13 +35,13 @@ namespace Polyjam2023
             button = null;
         }
 
-        public void SetPresentationData(CardPresentationData cardPresentationData, int quantity)
+        public void SetPresentationData(CardTemplate cardTemplate, int quantity)
         {
-            cardName.text = cardPresentationData.name;
-            cardImage.sprite = cardPresentationData.image;
+            cardName.text = cardTemplate.CardName;
+            cardImage.sprite = cardTemplate.Image;
             Assert.IsTrue(quantity > 0, "Trying to write card quantity not above zero.");
             quantityText.text = quantity > 1 ? $"x{quantity.ToString()}" : "";
-            cardDescription.text = cardPresentationData.effectDescription;
+            cardDescription.text = cardTemplate.EffectDescription;
         }
     }
 }

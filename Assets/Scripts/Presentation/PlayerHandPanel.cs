@@ -67,7 +67,7 @@ namespace Polyjam2023
             int i = 0;
             foreach (var cardEntry in gameplayManager.GameState.PlayerHand.Cards)
             {
-                cardWidgets[i].SetPresentationData(cardLibrary.GetCardPresentationData(cardEntry.name), cardEntry.quantity);
+                cardWidgets[i].SetPresentationData(cardLibrary.GetCardTemplate(cardEntry.name), cardEntry.quantity);
                 ++i;
             }
         }

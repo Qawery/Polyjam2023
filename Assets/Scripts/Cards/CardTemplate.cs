@@ -10,16 +10,14 @@ namespace Polyjam2023
      * -Image preview.
      * -Effect description preview.
      */
-    public abstract class CardDescription : ScriptableObject
+    public abstract class CardTemplate : ScriptableObject
     {
         [SerializeField] private string cardName;
         [SerializeField] private Sprite image;
-        [SerializeField] private string fluffDescription;
         
         public string CardName => cardName;
         public Sprite Image => image;
         public abstract string EffectDescription { get; }
-        public string FluffDescription => fluffDescription;
         
         public abstract bool TryPlayCard(GameState gameState);
     }

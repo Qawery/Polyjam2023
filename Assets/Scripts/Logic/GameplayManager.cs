@@ -20,8 +20,7 @@ namespace Polyjam2023
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Test Card 1", "Test Card 1", "Test Card 1", "Test Card 1",
-                "Test Card 2", "Test Card 2", "Test Card 2", "Test Card 2"
+                "Test Card 1", "Unit"
             });
             GameState.PlayerDeck.Shuffle();
         }
@@ -33,7 +32,7 @@ namespace Polyjam2023
 
         public void PlayPlayerCard(string cardName)
         {
-            if (cardLibrary.GetCardDescription(cardName).TryPlayCard(GameState))
+            if (cardLibrary.GetCardTemplate(cardName).TryPlayCard(GameState))
             {
                 GameState.PlayerHand.RemoveCard(cardName);
             }
