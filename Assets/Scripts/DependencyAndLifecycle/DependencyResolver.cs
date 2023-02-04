@@ -10,12 +10,14 @@ namespace Polyjam2023
         [SerializeField] private CardLibrary cardLibrary;
         [SerializeField] private CardWidget cardWidgetPrefab;
         [SerializeField] private UnitInstanceWidget unitInstanceWidgetPrefab;
+        [SerializeField] private MenuPanelManager pauseMenu;
         
         public GameplayManager GameplayManager => gameplayManager;
         public InputManager InputManager => inputManager;
         public CardLibrary CardLibrary => cardLibrary;
         public CardWidget CardWidgetPrefab => cardWidgetPrefab;
         public UnitInstanceWidget UnitInstanceWidgetPrefab => unitInstanceWidgetPrefab;
+        public MenuPanelManager PauseMenu => pauseMenu;
 
         private void Awake()
         {
@@ -24,6 +26,7 @@ namespace Polyjam2023
             Assert.IsNotNull(cardLibrary);
             Assert.IsNotNull(cardWidgetPrefab);
             Assert.IsNotNull(unitInstanceWidgetPrefab);
+            Assert.IsNotNull(pauseMenu);
         }
 
         private void OnDestroy()
@@ -33,6 +36,7 @@ namespace Polyjam2023
             cardLibrary = null;
             cardWidgetPrefab = null;
             unitInstanceWidgetPrefab = null;
+            pauseMenu = null;
         }
     }
 }

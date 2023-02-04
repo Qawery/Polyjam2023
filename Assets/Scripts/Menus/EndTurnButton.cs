@@ -6,21 +6,21 @@ namespace Polyjam2023
 {
     public class EndTurnButton : MonoBehaviour
     {
-        private GameplayManager gameplayManager;
+        private InputManager inputManager;
         private Button button;
 
         private void Awake()
         {
-            gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
-            Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
+            inputManager = FindObjectOfType<DependencyResolver>().InputManager;
+            Assert.IsNotNull(inputManager, $"Missing {nameof(inputManager)} on {gameObject.name}.");
             button = GetComponent<Button>();
             Assert.IsNotNull(button, $"Missing {nameof(button)} on {gameObject.name}.");
-            button.onClick.AddListener(() => { gameplayManager.EndPlayerTurn(); });
+            button.onClick.AddListener(() => { inputManager.EndPlayerTurn(); });
         }
 
         private void OnDestroy()
         {
-            gameplayManager = null;
+            inputManager = null;
             button.onClick.RemoveAllListeners();
             button = null;
         }
