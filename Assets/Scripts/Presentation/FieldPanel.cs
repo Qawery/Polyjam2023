@@ -11,8 +11,8 @@ namespace Polyjam2023
         [SerializeField] private UnitWidget unitWidgetPrefab;
         [SerializeField] private RectTransform enemyUnitWidgetsContainer;
         [SerializeField] private RectTransform playerUnitWidgetsContainer;
-        private List<UnitWidget> enemyUnitWidgets = new();
-        private List<UnitWidget> playerUnitWidgets = new();
+        private List<UnitWidget> enemyUnitWidgets = new ();
+        private List<UnitWidget> playerUnitWidgets = new ();
 
         private void Awake()
         {

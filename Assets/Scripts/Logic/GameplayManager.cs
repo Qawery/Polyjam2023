@@ -6,7 +6,7 @@ namespace Polyjam2023
 {
     public class GameplayManager : MonoBehaviour
     {
-        private const int StartingCards = 5;
+        private const int StartingCards = 2;
         private const int DrawCardsPerTurn = 2;
         
         [SerializeField] private CardLibrary cardLibrary;
@@ -20,14 +20,17 @@ namespace Polyjam2023
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Test Card 1", "Unit"
+                "Fast Player Unit", "Slow Player Unit",
+                "Fast Player Unit", "Slow Player Unit",
+                "Fast Player Unit", "Slow Player Unit"
             });
-            GameState.PlayerDeck.Shuffle();
+            //GameState.PlayerDeck.Shuffle();
         }
 
         private void Start()
         {
             GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(StartingCards));
+            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Enemy Unit") as UnitCardTemplate));
         }
 
         public void PlayPlayerCard(string cardName)
@@ -40,13 +43,15 @@ namespace Polyjam2023
 
         public void EndPlayerTurn()
         {
+            GameState.Field.ResolveFieldCombat();
+            
             //Enemy turn.
-            //TODO:
+            //TODO
             
             //Victory conditions.
             if (GameState.PlayerDeck.NumberOfCardsInDeck > 0)
             {
-                GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(DrawCardsPerTurn));
+                //GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(DrawCardsPerTurn));
             }
             else
             {
