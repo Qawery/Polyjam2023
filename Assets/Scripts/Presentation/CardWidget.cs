@@ -8,6 +8,7 @@ namespace Polyjam2023
     {
         [SerializeField] private TMPro.TextMeshProUGUI cardName;
         [SerializeField] private Image cardImage;
+        [SerializeField] private Image quantityImage;
         [SerializeField] private TMPro.TextMeshProUGUI quantityText;
         [SerializeField] private TMPro.TextMeshProUGUI cardDescription;
         [SerializeField] private Button button;
@@ -26,6 +27,7 @@ namespace Polyjam2023
         {
             Assert.IsNotNull(cardName, $"Missing {nameof(cardName)} on {gameObject.name}.");
             Assert.IsNotNull(cardImage, $"Missing {nameof(cardImage)} on {gameObject.name}.");
+            Assert.IsNotNull(quantityImage, $"Missing {nameof(quantityImage)} on {gameObject.name}.");
             Assert.IsNotNull(quantityText, $"Missing {nameof(quantityText)} on {gameObject.name}.");
             Assert.IsNotNull(cardDescription, $"Missing {nameof(cardDescription)} on {gameObject.name}.");
             Assert.IsNotNull(button, $"Missing {nameof(button)} on {gameObject.name}.");
@@ -41,6 +43,7 @@ namespace Polyjam2023
         {
             cardName = null;
             cardImage = null;
+            quantityImage = null;
             quantityText = null;
             cardDescription = null;
             button.onClick.RemoveAllListeners();
@@ -60,7 +63,15 @@ namespace Polyjam2023
             cardName.text = cardTemplate.CardName;
             cardImage.sprite = cardTemplate.Image;
             Assert.IsTrue(quantity > 0, "Trying to write card quantity not above zero.");
-            quantityText.text = quantity > 1 ? $"x{quantity.ToString()}" : "";
+            if (quantity > 1)
+            {
+                quantityText.text = $"x{quantity.ToString()}";
+                quantityImage.gameObject.SetActive(true);
+            }
+            else
+            {
+                quantityImage.gameObject.SetActive(false);
+            }
             cardDescription.text = cardTemplate.EffectDescription;
             
             if (cardTemplate is UnitCardTemplate)

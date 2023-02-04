@@ -8,7 +8,8 @@ namespace Polyjam2023
     {
         private List<(string name, int quantity)> cards = new ();
 
-        public event System.Action OnChanged;
+        public event System.Action<string> OnCardAdded;
+        public event System.Action<string> OnCardRemoved;
         
         public IReadOnlyList<(string name, int quantity)> Cards => cards;
 
@@ -24,11 +25,11 @@ namespace Polyjam2023
                 bool entryNotFound = true;
                 for (int i = 0; i < cards.Count; ++i)
                 {
-                    var previousEntry = cards[i];
-                    if (previousEntry.name == cardToAdd)
+                    var existingEntry = cards[i];
+                    if (existingEntry.name == cardToAdd)
                     {
                         cards.RemoveAt(i);
-                        cards.Insert(i, (previousEntry.name, previousEntry.quantity + 1));
+                        cards.Insert(i, (existingEntry.name, existingEntry.quantity + 1));
                         entryNotFound = false;
                         break;
                     }
@@ -38,11 +39,11 @@ namespace Polyjam2023
                 {
                     cards.Add((cardToAdd, 1));
                 }
+                
+                OnCardAdded?.Invoke(cardToAdd);
             }
 
             cards = cards.OrderBy(card => card.name).ToList();
-            
-            OnChanged?.Invoke();
         }
         
         public void RemoveCard(string cardName)
@@ -57,7 +58,7 @@ namespace Polyjam2023
                     {
                         cards.Insert(i, (previousEntry.name, previousEntry.quantity - 1));
                     }
-                    OnChanged?.Invoke();
+                    OnCardRemoved?.Invoke(previousEntry.name);
                     return;
                 }
             }
