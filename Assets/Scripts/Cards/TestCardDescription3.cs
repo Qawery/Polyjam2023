@@ -3,9 +3,9 @@ using UnityEngine;
 namespace Polyjam2023
 {
     [CreateAssetMenu(menuName = "ScriptableObjects/TestCardLogic_3")]
-    public class TestCardLogic_3 : CardLogic
+    public class TestCardDescription3 : CardDescription
     {
-        public override string CardName => "Test Card 3";
+        public override string EffectDescription => "Test card 3 effect description.";
 
         public override bool TryPlayCard(GameState gameState)
         {

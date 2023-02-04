@@ -41,7 +41,7 @@ namespace Polyjam2023
             cardImage.sprite = cardPresentationData.image;
             Assert.IsTrue(quantity > 0, "Trying to write card quantity not above zero.");
             quantityText.text = quantity > 1 ? $"x{quantity.ToString()}" : "";
-            cardDescription.text = cardPresentationData.description;
+            cardDescription.text = cardPresentationData.effectDescription;
         }
     }
 }
