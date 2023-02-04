@@ -1,20 +1,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Zenject;
 
 namespace Polyjam2023
 {
     public class PlayerHandPanel : MonoBehaviour
     {
-        [Inject] private CardLibrary cardLibrary;
-        [Inject] private GameplayManager gameplayManager;
-        [Inject] private CardWidget cardWidgetPrefab;
+        private CardLibrary cardLibrary;
+        private GameplayManager gameplayManager;
+        private CardWidget cardWidgetPrefab;
         [SerializeField] private RectTransform cardWidgetsContainer;
         private List<CardWidget> cardWidgets = new();
 
         private void Awake()
         {
+            var dependencyResolver = FindObjectOfType<DependencyResolver>();
+            cardLibrary = dependencyResolver.CardLibrary;
+            gameplayManager = dependencyResolver.GameplayManager;
+            cardWidgetPrefab = dependencyResolver.CardWidgetPrefab;
+            
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(cardWidgetPrefab, $"Missing {nameof(cardWidgetPrefab)} on {gameObject.name}.");
@@ -31,7 +35,6 @@ namespace Polyjam2023
                 else
                 {
                     cardWidgets.Add(cardWidget);
-                    cardWidget.OnClicked += () => { gameplayManager.PlayPlayerCard(cardWidget.CardName); };
                     ++childIndex;
                 }
             }
@@ -62,13 +65,12 @@ namespace Polyjam2023
             {
                 var newCardWidget = Instantiate(cardWidgetPrefab, cardWidgetsContainer);
                 cardWidgets.Add(newCardWidget);
-                newCardWidget.OnClicked += () => { gameplayManager.PlayPlayerCard(newCardWidget.CardName); };
             }
 
             int i = 0;
             foreach (var cardEntry in gameplayManager.GameState.PlayerHand.Cards)
             {
-                cardWidgets[i].SetPresentationData(cardLibrary.GetCardTemplate(cardEntry.name), cardEntry.quantity);
+                cardWidgets[i].SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(cardEntry.name), cardEntry.quantity);
                 ++i;
             }
         }

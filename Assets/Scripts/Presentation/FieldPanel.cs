@@ -1,15 +1,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
-using Zenject;
 
 namespace Polyjam2023
 {
     public class FieldPanel : MonoBehaviour
     {
-        [Inject] private CardLibrary cardLibrary;
-        [Inject] private GameplayManager gameplayManager;
-        [Inject] private UnitInstanceWidget unitInstanceWidgetPrefab;
+        private CardLibrary cardLibrary;
+        private GameplayManager gameplayManager;
+        private UnitInstanceWidget unitInstanceWidgetPrefab;
         [SerializeField] private RectTransform enemyUnitWidgetsContainer;
         [SerializeField] private RectTransform playerUnitWidgetsContainer;
         private List<UnitInstanceWidget> enemyUnitWidgets = new ();
@@ -17,6 +16,11 @@ namespace Polyjam2023
 
         private void Awake()
         {
+            var dependencyResolver = FindObjectOfType<DependencyResolver>();
+            cardLibrary = dependencyResolver.CardLibrary;
+            gameplayManager = dependencyResolver.GameplayManager;
+            unitInstanceWidgetPrefab = dependencyResolver.UnitInstanceWidgetPrefab;
+        
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(unitInstanceWidgetPrefab, $"Missing {nameof(unitInstanceWidgetPrefab)} on {gameObject.name}.");
@@ -93,7 +97,7 @@ namespace Polyjam2023
             int i = 0;
             foreach (var unitInstance in unitsPresent)
             {
-                widgetCollection[i].SetPresentationData(unitInstance);
+                widgetCollection[i].SetPresentationData(gameplayManager.GameState.Field, unitInstance);
                 ++i;
             }
         }

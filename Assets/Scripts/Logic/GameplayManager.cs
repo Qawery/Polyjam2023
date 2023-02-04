@@ -1,27 +1,23 @@
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Assertions;
-using Zenject;
 
 namespace Polyjam2023
 {
-    public class GameplayManager : MonoInstaller
+    public class GameplayManager : MonoBehaviour
     {
+        private CardLibrary cardLibrary;
         private const int StartingCards = 5;
         private const int DrawCardsPerTurn = 2;
         
-        [Inject] private CardLibrary cardLibrary;
-
         public event System.Action<GameEndReason> OnGameEnded;
         
         public GameState GameState { get; private set; } = new ();
 
-        public override void InstallBindings()
-        {
-            Container.Bind<GameplayManager>().FromInstance(this).AsCached();
-        }
-
         private void Awake()
         {
+            cardLibrary = FindObjectOfType<DependencyResolver>().CardLibrary;
+            
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
@@ -33,12 +29,14 @@ namespace Polyjam2023
                 "Test Card 3", "Fast Player Unit", "Slow Player Unit"
             });
             GameState.PlayerDeck.Shuffle();
-        }
-
-        private void Start()
-        {
+            
             GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(StartingCards));
             GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Enemy Unit") as UnitCardTemplate));
+        }
+
+        private void OnDestroy()
+        {
+            cardLibrary = null;
         }
 
         public void PlayPlayerCard(string cardName)

@@ -296,6 +296,7 @@ MonoBehaviour:
   attackValue: {fileID: 8769177252545800816}
   initiativeValue: {fileID: 381126680152108456}
   healthValue: {fileID: 8068756073915070375}
+  button: {fileID: 3965711782992589131}
 --- !u!1 &4902038982916704750
 GameObject:
   m_ObjectHideFlags: 0

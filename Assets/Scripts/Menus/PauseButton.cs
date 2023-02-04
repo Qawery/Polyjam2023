@@ -20,6 +20,7 @@ namespace Polyjam2023
 
         private void OnDestroy()
         {
+            pauseMenu = null;
             button.onClick.RemoveAllListeners();
             button = null;
         }

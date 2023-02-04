@@ -47,6 +47,7 @@ namespace Polyjam2023
                 menuPanel.OnRequestTransitionToPanel -= SwitchToPanel;
             }
             menuPanels.Clear();
+            activeMenuPanels.Clear();
         }
         
         private void SwitchToPanel(MenuPanel menuPanel)

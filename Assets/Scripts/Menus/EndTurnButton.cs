@@ -1,18 +1,17 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
-using Zenject;
 
 namespace Polyjam2023
 {
     public class EndTurnButton : MonoBehaviour
     {
-        [Inject] private GameplayManager gameplayManager;
-        
+        private GameplayManager gameplayManager;
         private Button button;
 
         private void Awake()
         {
+            gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             button = GetComponent<Button>();
             Assert.IsNotNull(button, $"Missing {nameof(button)} on {gameObject.name}.");
@@ -21,6 +20,7 @@ namespace Polyjam2023
 
         private void OnDestroy()
         {
+            gameplayManager = null;
             button.onClick.RemoveAllListeners();
             button = null;
         }

@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using Zenject;
 
 namespace Polyjam2023
 {
     public class GameEndScreen : MonoBehaviour
     {
-        [Inject] private GameplayManager gameplayManager;
+        private GameplayManager gameplayManager;
         [SerializeField] private Image image;
         [SerializeField] private TMPro.TextMeshProUGUI gameEndReasonText;
         [SerializeField] private Button returnToMainMenuButton;
@@ -18,6 +17,7 @@ namespace Polyjam2023
 
         private void Awake()
         {
+            gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             gameplayManager.OnGameEnded += OnGameEnded;
             Assert.IsNotNull(image, $"Missing {nameof(image)} on {gameObject.name}.");

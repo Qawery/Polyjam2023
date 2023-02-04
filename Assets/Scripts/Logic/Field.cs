@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace Polyjam2023
 {
-    public class Field
+    public class Field : ICardLocation
     {
         private List<UnitInstance> enemyUnitsPresent  = new ();
         private List<UnitInstance> playerUnitsPresent  = new ();

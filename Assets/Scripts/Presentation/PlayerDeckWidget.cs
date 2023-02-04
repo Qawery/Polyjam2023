@@ -1,13 +1,12 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
-using Zenject;
 
 namespace Polyjam2023
 {
     public class PlayerDeckWidget : MonoBehaviour
     {
-        [Inject] private GameplayManager gameplayManager;
+        private GameplayManager gameplayManager;
         [SerializeField] private TMPro.TextMeshProUGUI cardsCounter;
         [SerializeField] private Image deckImage;
         [SerializeField] private Sprite cardsPresentImage;
@@ -15,6 +14,7 @@ namespace Polyjam2023
         
         private void Awake()
         {
+            gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(cardsCounter, $"Missing {nameof(cardsCounter)} on {gameObject.name}.");
             Assert.IsNotNull(deckImage, $"Missing {nameof(deckImage)} on {gameObject.name}.");

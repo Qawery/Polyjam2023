@@ -4,7 +4,7 @@ using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
-    public class Hand
+    public class Hand : ICardLocation
     {
         private List<(string name, int quantity)> cards = new ();
 
