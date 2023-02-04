@@ -1,14 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using Zenject;
 
 namespace Polyjam2023
 {
     public class PlayerHandPanel : MonoBehaviour
     {
-        [SerializeField] private CardLibrary cardLibrary;
-        [SerializeField] private GameplayManager gameplayManager;
-        [SerializeField] private CardWidget cardWidgetPrefab;
+        [Inject] private CardLibrary cardLibrary;
+        [Inject] private GameplayManager gameplayManager;
+        [Inject] private CardWidget cardWidgetPrefab;
         [SerializeField] private RectTransform cardWidgetsContainer;
         private List<CardWidget> cardWidgets = new();
 

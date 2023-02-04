@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Polyjam2023
 {
     public class PlayerDeckWidget : MonoBehaviour
     {
-        [SerializeField] private GameplayManager gameplayManager;
+        [Inject] private GameplayManager gameplayManager;
         [SerializeField] private TMPro.TextMeshProUGUI cardsCounter;
         [SerializeField] private Image deckImage;
         [SerializeField] private Sprite cardsPresentImage;

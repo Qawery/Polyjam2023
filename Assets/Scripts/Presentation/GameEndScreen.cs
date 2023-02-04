@@ -2,12 +2,13 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using Zenject;
 
 namespace Polyjam2023
 {
     public class GameEndScreen : MonoBehaviour
     {
-        [SerializeField] private GameplayManager gameplayManager;
+        [Inject] private GameplayManager gameplayManager;
         [SerializeField] private Image image;
         [SerializeField] private TMPro.TextMeshProUGUI gameEndReasonText;
         [SerializeField] private Button returnToMainMenuButton;

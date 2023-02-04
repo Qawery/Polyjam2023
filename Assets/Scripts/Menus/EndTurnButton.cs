@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Assertions;
+using Zenject;
 
 namespace Polyjam2023
 {
     public class EndTurnButton : MonoBehaviour
     {
-        [SerializeField] private GameplayManager gameplayManager;
+        [Inject] private GameplayManager gameplayManager;
         
         private Button button;
 

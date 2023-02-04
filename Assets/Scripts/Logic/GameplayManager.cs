@@ -1,30 +1,38 @@
 using System.Collections.Generic;
-using UnityEngine;
 using UnityEngine.Assertions;
+using Zenject;
 
 namespace Polyjam2023
 {
-    public class GameplayManager : MonoBehaviour
+    public class GameplayManager : MonoInstaller
     {
-        private const int StartingCards = 2;
+        private const int StartingCards = 5;
         private const int DrawCardsPerTurn = 2;
         
-        [SerializeField] private CardLibrary cardLibrary;
+        [Inject] private CardLibrary cardLibrary;
 
         public event System.Action<GameEndReason> OnGameEnded;
         
         public GameState GameState { get; private set; } = new ();
+
+        public override void InstallBindings()
+        {
+            Container.Bind<GameplayManager>().FromInstance(this).AsCached();
+        }
 
         private void Awake()
         {
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Fast Player Unit", "Slow Player Unit",
-                "Fast Player Unit", "Slow Player Unit",
-                "Fast Player Unit", "Slow Player Unit"
+                "Test Card 1", "Fast Player Unit", "Slow Player Unit",
+                "Test Card 2", "Fast Player Unit", "Slow Player Unit",
+                "Test Card 3", "Fast Player Unit", "Slow Player Unit",
+                "Test Card 1", "Fast Player Unit", "Slow Player Unit",
+                "Test Card 2", "Fast Player Unit", "Slow Player Unit",
+                "Test Card 3", "Fast Player Unit", "Slow Player Unit"
             });
-            //GameState.PlayerDeck.Shuffle();
+            GameState.PlayerDeck.Shuffle();
         }
 
         private void Start()
@@ -46,12 +54,12 @@ namespace Polyjam2023
             GameState.Field.ResolveFieldCombat();
             
             //Enemy turn.
-            //TODO
+            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Enemy Unit") as UnitCardTemplate));
             
             //Victory conditions.
             if (GameState.PlayerDeck.NumberOfCardsInDeck > 0)
             {
-                //GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(DrawCardsPerTurn));
+                GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(DrawCardsPerTurn));
             }
             else
             {

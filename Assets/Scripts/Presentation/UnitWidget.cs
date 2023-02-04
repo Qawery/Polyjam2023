@@ -8,7 +8,6 @@ namespace Polyjam2023
     {
         [SerializeField] private TMPro.TextMeshProUGUI cardName;
         [SerializeField] private Image cardImage;
-
         
         private void Awake()
         {

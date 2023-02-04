@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,6 +11,11 @@ namespace Polyjam2023
     {
         [SerializeField] private List<CardTemplate> cardTemplateLibrary = new ();
         private Dictionary<string, CardTemplate> cardTemplatesByName;
+
+        private void Awake()
+        {
+            OnValidate();
+        }
 
         private void OnValidate()
         {
@@ -29,7 +35,8 @@ namespace Polyjam2023
 
         public CardTemplate GetCardTemplate(string name)
         {
-            Assert.IsTrue(cardTemplatesByName.TryGetValue(name, out var cardTemplate), $"No data in library for card name <{name}>.");
+            bool foundKey = cardTemplatesByName.TryGetValue(name, out var cardTemplate);
+            Assert.IsTrue(foundKey, $"No data in library for card name <{name}>.");
             return cardTemplate;
         }
     }
