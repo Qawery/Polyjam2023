@@ -82,40 +82,32 @@ namespace Polyjam2023
             cardWidgets.Clear();
         }
 
-        private void OnCardAdded(string addedCardName)
+        private void OnCardAdded((string name, int quantity) entry)
         {
             var newFloatingText = Instantiate(floatingTextPrefab);
+            newFloatingText.SetText("Card added");
             newFloatingText.gameObject.SetActive(false);
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>
                 {
-                    CardWidget foundCardWidget = null;
-                    bool entryNotFound = true;
-                    for (int i = 0; i < cardWidgets.Count; ++i)
+                    CardWidget cardWidget = null;
+                    if (entry.quantity == 1)
                     {
-                        foundCardWidget = cardWidgets[i];
-                        if (foundCardWidget.CardName == addedCardName)
-                        {
-                            entryNotFound = false;
-                            break;
-                        }
+                        cardWidget = Instantiate(cardWidgetPrefab, cardWidgetsContainer);
+                        cardWidgets.Add(cardWidget);
                     }
-
-                    if (entryNotFound)
+                    else
                     {
-                        foundCardWidget = Instantiate(cardWidgetPrefab, cardWidgetsContainer);
-                        cardWidgets.Add(foundCardWidget);
+                        cardWidget = cardWidgets.FirstOrDefault(widget => widget.CardName == entry.name);
                     }
-
-                    var cardEntry = gameplayManager.GameState.PlayerHand.Cards.FirstOrDefault(entry => entry.name == addedCardName);
-                    foundCardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(cardEntry.name), cardEntry.quantity);
+                    cardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(entry.name), entry.quantity);
+                    
                     cardWidgets.ForEach(cardWidget => cardWidget.transform.SetParent(null));
                     cardWidgets = cardWidgets.OrderBy(widget => widget.CardName).ToList();
                     cardWidgets.ForEach(cardWidget => cardWidget.transform.SetParent(cardWidgetsContainer));
                     
-                    newFloatingText.transform.SetParent(foundCardWidget.transform);
-                    newFloatingText.transform.position = foundCardWidget.transform.position;
-                    newFloatingText.SetText("Card added");
+                    newFloatingText.transform.SetParent(cardWidget.transform);
+                    newFloatingText.transform.position = cardWidget.transform.position;
                     newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
@@ -124,32 +116,29 @@ namespace Polyjam2023
             ));
         }
         
-        private void OnCardRemoved(string removedCardName)
+        private void OnCardRemoved((string name, int quantity) entry)
         {
             var newFloatingText = Instantiate(floatingTextPrefab);
+            newFloatingText.SetText("Card removed");
             newFloatingText.gameObject.SetActive(false);
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>
                 {
-                    var foundCardWidget = cardWidgets.FirstOrDefault(widget => widget.CardName == removedCardName);
-                    newFloatingText.SetText("Card Removed");
-                    newFloatingText.gameObject.SetActive(true);
-
-                    if (gameplayManager.GameState.PlayerHand.Cards.Any(entry => entry.name == removedCardName))
+                    var cardWidget = cardWidgets.FirstOrDefault(widget => widget.CardName == entry.name);
+                    if (entry.quantity == 0)
                     {
-                        var cardEntry = gameplayManager.GameState.PlayerHand.Cards.FirstOrDefault(entry =>
-                            entry.name == removedCardName);
-                        foundCardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(cardEntry.name), cardEntry.quantity);
-                        newFloatingText.transform.SetParent(foundCardWidget.transform);
-                        newFloatingText.transform.position = foundCardWidget.transform.position;
+                        cardWidgets.Remove(cardWidget);
+                        newFloatingText.transform.SetParent(cardWidgetsContainer.transform);
+                        newFloatingText.transform.position = cardWidget.transform.position;
+                        Destroy(cardWidget.gameObject);
                     }
                     else
                     {
-                        newFloatingText.transform.SetParent(cardWidgetsContainer);
-                        newFloatingText.transform.position = foundCardWidget.transform.position;
-                        cardWidgets.Remove(foundCardWidget);
-                        Destroy(foundCardWidget.gameObject);
+                        cardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(entry.name), entry.quantity);
+                        newFloatingText.transform.SetParent(cardWidget.transform);
+                        newFloatingText.transform.position = cardWidget.transform.position;
                     }
+                    newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
                 () => { },

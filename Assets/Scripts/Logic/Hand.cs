@@ -8,8 +8,8 @@ namespace Polyjam2023
     {
         private List<(string name, int quantity)> cards = new ();
 
-        public event System.Action<string> OnCardAdded;
-        public event System.Action<string> OnCardRemoved;
+        public event System.Action<(string name, int quantity)> OnCardAdded;
+        public event System.Action<(string name, int quantity)> OnCardRemoved;
         
         public IReadOnlyList<(string name, int quantity)> Cards => cards;
 
@@ -23,13 +23,15 @@ namespace Polyjam2023
             foreach (var cardToAdd in cardsToAdd)
             {
                 bool entryNotFound = true;
+                (string name, int quantity) existingEntry = ("", 0);
                 for (int i = 0; i < cards.Count; ++i)
                 {
-                    var existingEntry = cards[i];
+                    existingEntry = cards[i];
                     if (existingEntry.name == cardToAdd)
                     {
                         cards.RemoveAt(i);
-                        cards.Insert(i, (existingEntry.name, existingEntry.quantity + 1));
+                        existingEntry = (existingEntry.name, existingEntry.quantity + 1);
+                        cards.Insert(i, existingEntry);
                         entryNotFound = false;
                         break;
                     }
@@ -37,10 +39,11 @@ namespace Polyjam2023
 
                 if (entryNotFound)
                 {
-                    cards.Add((cardToAdd, 1));
+                    existingEntry = (cardToAdd, 1);
+                    cards.Add(existingEntry);
                 }
                 
-                OnCardAdded?.Invoke(cardToAdd);
+                OnCardAdded?.Invoke(existingEntry);
             }
 
             cards = cards.OrderBy(card => card.name).ToList();
@@ -58,7 +61,7 @@ namespace Polyjam2023
                     {
                         cards.Insert(i, (previousEntry.name, previousEntry.quantity - 1));
                     }
-                    OnCardRemoved?.Invoke(previousEntry.name);
+                    OnCardRemoved?.Invoke((previousEntry.name, previousEntry.quantity - 1));
                     return;
                 }
             }
