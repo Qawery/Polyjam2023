@@ -9,9 +9,10 @@ namespace Polyjam2023
         private List<UnitInstance> enemyUnitsPresent  = new ();
         private List<UnitInstance> playerUnitsPresent  = new ();
 
-        public event System.Action OnEnemyUnitsChanged;
-        public event System.Action OnPlayerUnitsChanged;
-        
+        public event System.Action<UnitInstance> OnUnitAdded;
+        public event System.Action<UnitInstance> OnUnitWounded;
+        public event System.Action<UnitInstance> OnUnitKilled;
+
         public IReadOnlyList<UnitInstance> EnemyUnitsPresent => enemyUnitsPresent;
         public IReadOnlyList<UnitInstance> PlayerUnitsPresent => playerUnitsPresent;
 
@@ -20,13 +21,12 @@ namespace Polyjam2023
             if (newUnitInstance.UnitCardTemplate.Ownership == Ownership.Enemy)
             {
                 enemyUnitsPresent.Add(newUnitInstance);
-                OnEnemyUnitsChanged?.Invoke();
             }
             else
             {
                 playerUnitsPresent.Add(newUnitInstance);
-                OnPlayerUnitsChanged?.Invoke();
             }
+            OnUnitAdded?.Invoke(newUnitInstance);
         }
 
         public void ResolveFieldCombat()
@@ -97,11 +97,13 @@ namespace Polyjam2023
                         targetPlayerUnit.currentHealth = 0;
                         playerUnitsPresent.Remove(targetPlayerUnit);
                         unitsKilled.Add(targetPlayerUnit);
+                        OnUnitKilled?.Invoke(targetPlayerUnit);
                     }
                     else
                     {
                         targetPlayerUnit.currentHealth -= enemyAttackPotential;
                         enemyAttackPotential = 0;
+                        OnUnitWounded?.Invoke(targetPlayerUnit);
                     }
                 }
                 #endregion
@@ -116,11 +118,13 @@ namespace Polyjam2023
                         targetEnemyUnit.currentHealth = 0;
                         enemyUnitsPresent.Remove(targetEnemyUnit);
                         unitsKilled.Add(targetEnemyUnit);
+                        OnUnitKilled?.Invoke(targetEnemyUnit);
                     }
                     else
                     {
                         targetEnemyUnit.currentHealth -= playerAttackPotential;
                         playerAttackPotential = 0;
+                        OnUnitWounded?.Invoke(targetEnemyUnit);
                     }
                 }
                 #endregion
@@ -130,9 +134,6 @@ namespace Polyjam2023
                     break;
                 }
             }
-            
-            OnEnemyUnitsChanged?.Invoke();
-            OnPlayerUnitsChanged?.Invoke();
         }
     }
 }

@@ -6,22 +6,24 @@ namespace Polyjam2023
 {
     public class UnitInstanceWidget : MonoBehaviour
     {
-        private InputManager inputManager;
+        private PresentationManager presentationManager;
         [SerializeField] private TMPro.TextMeshProUGUI cardName;
         [SerializeField] private Image cardImage;
         [SerializeField] private TMPro.TextMeshProUGUI attackValue;
         [SerializeField] private TMPro.TextMeshProUGUI initiativeValue;
         [SerializeField] private TMPro.TextMeshProUGUI healthValue;
         [SerializeField] private Button button;
+        private UnitInstance unitInstance;
 
         public static event System.Action<UnitInstanceWidget> OnUnitInstanceWidgetClicked;
         
+        public UnitInstance UnitInstance => unitInstance;
         private ICardLocation CardLocation { get; set; }
         
         private void Awake()
         {
-            inputManager = FindObjectOfType<DependencyResolver>().InputManager;
-            Assert.IsNotNull(inputManager);
+            presentationManager = FindObjectOfType<DependencyResolver>().PresentationManager;
+            Assert.IsNotNull(presentationManager);
             Assert.IsNotNull(cardName, $"Missing {nameof(cardName)} on {gameObject.name}.");
             Assert.IsNotNull(cardImage, $"Missing {nameof(cardImage)} on {gameObject.name}.");
             Assert.IsNotNull(attackValue, $"Missing {nameof(attackValue)} on {gameObject.name}.");
@@ -33,7 +35,7 @@ namespace Polyjam2023
 
         private void OnDestroy()
         {
-            inputManager = null;
+            presentationManager = null;
             cardName = null;
             cardImage = null;
             attackValue = null;
@@ -41,10 +43,12 @@ namespace Polyjam2023
             healthValue = null;
             button.onClick.RemoveAllListeners();
             button = null;
+            unitInstance = null;
         }
 
         public void SetPresentationData(ICardLocation cardLocation, UnitInstance unitInstance)
         {
+            this.unitInstance = unitInstance;
             Assert.IsNotNull(cardLocation, $"Trying to assign null {nameof(cardLocation)} to {nameof(CardWidget)}.");
             CardLocation = cardLocation;
             

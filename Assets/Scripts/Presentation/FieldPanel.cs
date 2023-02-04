@@ -6,9 +6,11 @@ namespace Polyjam2023
 {
     public class FieldPanel : MonoBehaviour
     {
+        private PresentationManager presentationManager;
         private CardLibrary cardLibrary;
         private GameplayManager gameplayManager;
         private UnitInstanceWidget unitInstanceWidgetPrefab;
+        private FloatingText floatingTextPrefab;
         [SerializeField] private RectTransform enemyUnitWidgetsContainer;
         [SerializeField] private RectTransform playerUnitWidgetsContainer;
         private List<UnitInstanceWidget> enemyUnitWidgets = new ();
@@ -17,9 +19,11 @@ namespace Polyjam2023
         private void Awake()
         {
             var dependencyResolver = FindObjectOfType<DependencyResolver>();
+            presentationManager = dependencyResolver.PresentationManager;
             cardLibrary = dependencyResolver.CardLibrary;
             gameplayManager = dependencyResolver.GameplayManager;
             unitInstanceWidgetPrefab = dependencyResolver.UnitInstanceWidgetPrefab;
+            floatingTextPrefab = dependencyResolver.FloatingTextPrefab;
         
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
@@ -29,21 +33,28 @@ namespace Polyjam2023
 
             CleanupPresentWidgets(enemyUnitWidgetsContainer, ref enemyUnitWidgets);
             CleanupPresentWidgets(playerUnitWidgetsContainer, ref playerUnitWidgets);
+
+            gameplayManager.GameState.Field.OnUnitAdded += OnUnitAdded;
+            gameplayManager.GameState.Field.OnUnitWounded += OnUnitWounded;
+            gameplayManager.GameState.Field.OnUnitKilled += OnUnitKilled;
             
-            gameplayManager.GameState.Field.OnEnemyUnitsChanged += OnEnemyUnitsChanged;
-            gameplayManager.GameState.Field.OnPlayerUnitsChanged += OnPlayerUnitsChanged;
-            
-            OnEnemyUnitsChanged();
-            OnPlayerUnitsChanged();
+            var enemyUnitsPresent = gameplayManager.GameState.Field.EnemyUnitsPresent;
+            OnUnitsChanged(ref enemyUnitsPresent, ref enemyUnitWidgetsContainer, ref enemyUnitWidgets);
+            var playerUnitsPresent = gameplayManager.GameState.Field.PlayerUnitsPresent;
+            OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
         }
 
         private void OnDestroy()
         {
-            gameplayManager.GameState.Field.OnEnemyUnitsChanged -= OnEnemyUnitsChanged;
-            gameplayManager.GameState.Field.OnPlayerUnitsChanged -= OnPlayerUnitsChanged;
+            gameplayManager.GameState.Field.OnUnitAdded -= OnUnitAdded;
+            gameplayManager.GameState.Field.OnUnitWounded -= OnUnitWounded;
+            gameplayManager.GameState.Field.OnUnitKilled -= OnUnitKilled;
+
+            presentationManager = null;
             cardLibrary = null;
             gameplayManager = null;
             unitInstanceWidgetPrefab = null;
+            floatingTextPrefab = null;
             enemyUnitWidgetsContainer = null;
             playerUnitWidgetsContainer = null;
             enemyUnitWidgets.Clear();
@@ -67,18 +78,6 @@ namespace Polyjam2023
                 }
             }
         }
-        
-        private void OnEnemyUnitsChanged()
-        {
-            var enemyUnitsPresent = gameplayManager.GameState.Field.EnemyUnitsPresent;
-            OnUnitsChanged(ref enemyUnitsPresent, ref enemyUnitWidgetsContainer, ref enemyUnitWidgets);
-        }
-        
-        private void OnPlayerUnitsChanged()
-        {
-            var playerUnitsPresent = gameplayManager.GameState.Field.PlayerUnitsPresent;
-            OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
-        }
 
         private void OnUnitsChanged(ref IReadOnlyList<UnitInstance> unitsPresent, ref RectTransform widgetContainer, ref List<UnitInstanceWidget> widgetCollection)
         {
@@ -100,6 +99,36 @@ namespace Polyjam2023
                 widgetCollection[i].SetPresentationData(gameplayManager.GameState.Field, unitInstance);
                 ++i;
             }
+        }
+
+        private void OnUnitAdded(UnitInstance unitInstance)
+        {
+            var newUnitWidget = Instantiate(unitInstanceWidgetPrefab, unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? 
+                                                                playerUnitWidgetsContainer : enemyUnitWidgetsContainer);
+            newUnitWidget.SetPresentationData(gameplayManager.GameState.Field, unitInstance);
+            (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets).Add(newUnitWidget);
+            var newFloatingText = Instantiate(floatingTextPrefab, newUnitWidget.transform);
+            newFloatingText.SetText("Unit spawned");
+            newUnitWidget.gameObject.SetActive(false);
+            newFloatingText.gameObject.SetActive(false);
+            
+            presentationManager.AddPresentationTask(new PresentationTask
+                (() =>
+                    {
+                        newUnitWidget.gameObject.SetActive(true);
+                        newFloatingText.gameObject.SetActive(true);
+                    },
+                    (float deltaTime) => { },
+                    () => { },
+                    () => newFloatingText == null));
+        }
+        
+        private void OnUnitWounded(UnitInstance unitInstance)
+        {
+        }
+        
+        private void OnUnitKilled(UnitInstance unitInstance)
+        {
         }
     }
 }

@@ -6,22 +6,22 @@ namespace Polyjam2023
 {
     public class PauseButton : MonoBehaviour
     {
-        private InputManager inputManager;
+        private PresentationManager presentationManager;
         
         private Button button;
 
         private void Awake()
         {
-            inputManager = FindObjectOfType<DependencyResolver>().InputManager;
-            Assert.IsNotNull(inputManager, $"Missing {nameof(inputManager)} on {gameObject.name}.");
+            presentationManager = FindObjectOfType<DependencyResolver>().PresentationManager;
+            Assert.IsNotNull(presentationManager, $"Missing {nameof(presentationManager)} on {gameObject.name}.");
             button = GetComponent<Button>();
             Assert.IsNotNull(button, $"Missing {nameof(button)} on {gameObject.name}.");
-            button.onClick.AddListener(() => { inputManager.ShowPauseMenu(); });
+            button.onClick.AddListener(() => { presentationManager.ShowPauseMenu(); });
         }
 
         private void OnDestroy()
         {
-            inputManager = null;
+            presentationManager = null;
             button.onClick.RemoveAllListeners();
             button = null;
         }

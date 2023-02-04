@@ -1,13 +1,19 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
-    public class InputManager : MonoBehaviour
+    public class PresentationManager : MonoBehaviour
     {
+        private List<PresentationTask> ongoingTasks = new ();
+        private PresentationTask currentTask = null;
+        
         private GameplayManager gameplayManager;
         private MenuPanelManager pauseMenu;
 
+        private bool IsBlocked => currentTask != null || ongoingTasks.Count > 0;
+        
         private void Awake()
         {
             var dependencyResolver = FindObjectOfType<DependencyResolver>();
@@ -27,22 +33,68 @@ namespace Polyjam2023
             pauseMenu = null;
         }
 
+        private void Update()
+        {
+            if (currentTask != null)
+            {
+                if (!currentTask.IsFinished())
+                {
+                    currentTask.Update(Time.deltaTime);
+                    return;
+                }
+                
+                currentTask.Finish();
+            }
+
+            if (ongoingTasks.Count > 0)
+            {
+                currentTask = ongoingTasks[0];
+                ongoingTasks.RemoveAt(0);
+                currentTask.Start();
+            }
+            else
+            {
+                currentTask = null;
+            }
+        }
+
+        public void AddPresentationTask(PresentationTask presentationTask)
+        {
+            ongoingTasks.Add(presentationTask);
+        }
+
         private void OnCardWidgetClicked(CardWidget cardWidget)
         {
+            if (IsBlocked)
+            {
+                return;
+            }
             gameplayManager.PlayPlayerCard(cardWidget.CardName);
         }
         
         private void OnUnitInstanceWidgetClicked(UnitInstanceWidget unitInstanceWidget)
         {
+            if (IsBlocked)
+            {
+                return;
+            }
         }
 
         public void EndPlayerTurn()
         {
+            if (IsBlocked)
+            {
+                return;
+            }
             gameplayManager.EndPlayerTurn();
         }
 
         public void ShowPauseMenu()
         {
+            if (IsBlocked)
+            {
+                return;
+            }
             pauseMenu.gameObject.SetActive(true);
         }
     }

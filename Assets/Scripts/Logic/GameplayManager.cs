@@ -9,7 +9,7 @@ namespace Polyjam2023
         private CardLibrary cardLibrary;
         private const int StartingCards = 5;
         private const int DrawCardsPerTurn = 2;
-        
+
         public event System.Action<GameEndReason> OnGameEnded;
         
         public GameState GameState { get; private set; } = new ();
