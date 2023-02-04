@@ -8,7 +8,7 @@ namespace Polyjam2023
         private RectTransform rectTransform;
         private TMPro.TextMeshProUGUI text;
         private float lifeTime = 1.0f;
-        private const float speed = 1.0f;
+        private const float speed = 20.0f;
 
         private void Awake()
         {

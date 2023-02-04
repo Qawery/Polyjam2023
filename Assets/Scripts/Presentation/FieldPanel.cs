@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -113,22 +114,65 @@ namespace Polyjam2023
             newFloatingText.gameObject.SetActive(false);
             
             presentationManager.AddPresentationTask(new PresentationTask
-                (() =>
-                    {
-                        newUnitWidget.gameObject.SetActive(true);
-                        newFloatingText.gameObject.SetActive(true);
-                    },
-                    (float deltaTime) => { },
-                    () => { },
-                    () => newFloatingText == null));
+            (() =>
+                {
+                    newUnitWidget.gameObject.SetActive(true);
+                    newFloatingText.gameObject.SetActive(true);
+                },
+                (float deltaTime) => { },
+                () => { },
+                () => newFloatingText == null
+            ));
         }
         
         private void OnUnitWounded(UnitInstance unitInstance)
         {
+            var unitWidget = (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets)
+                                .FirstOrDefault(widget => widget.UnitInstance == unitInstance);
+            var newFloatingText = Instantiate(floatingTextPrefab, unitWidget.transform);
+            newFloatingText.SetText("Wounded");
+            newFloatingText.gameObject.SetActive(false);
+            presentationManager.AddPresentationTask(new PresentationTask
+            (() =>
+                {
+                    newFloatingText.gameObject.SetActive(true);
+                },
+                (float deltaTime) => { },
+                () => { },
+                () => newFloatingText == null
+            ));
         }
         
         private void OnUnitKilled(UnitInstance unitInstance)
         {
+            var newFloatingText = Instantiate(floatingTextPrefab);
+            newFloatingText.gameObject.SetActive(false);
+            newFloatingText.SetText("Killed");
+            presentationManager.AddPresentationTask(new PresentationTask
+            (() =>
+                {
+                    newFloatingText.gameObject.SetActive(true);
+                    if (unitInstance.UnitCardTemplate.Ownership == Ownership.Player)
+                    {
+                        var unitWidget = playerUnitWidgets.FirstOrDefault(widget => widget.UnitInstance == unitInstance);
+                        newFloatingText.transform.SetParent(playerUnitWidgetsContainer);
+                        newFloatingText.transform.position = unitWidget.transform.position;
+                        playerUnitWidgets.Remove(unitWidget);
+                        Destroy(unitWidget.gameObject);
+                    }
+                    else
+                    {
+                        var unitWidget = enemyUnitWidgets.FirstOrDefault(widget => widget.UnitInstance == unitInstance);
+                        newFloatingText.transform.SetParent(enemyUnitWidgetsContainer);
+                        newFloatingText.transform.position = unitWidget.transform.position;
+                        enemyUnitWidgets.Remove(unitWidget);
+                        Destroy(unitWidget.gameObject);
+                    }
+                },
+                (float deltaTime) => { },
+                () => { },
+                () => newFloatingText == null)
+            );
         }
     }
 }
