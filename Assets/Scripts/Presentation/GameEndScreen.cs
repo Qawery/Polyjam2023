@@ -47,7 +47,7 @@ namespace Polyjam2023
         private void OnGameEnded(GameEndReason reason)
         {
             gameplayManager.OnGameEnded -= OnGameEnded;
-            float timer = 2.0f;
+            float timer = 1.0f;
             presentationManager.AddPresentationTask(new PresentationTask
             (
                 () => { },

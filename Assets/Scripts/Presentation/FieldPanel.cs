@@ -72,7 +72,7 @@ namespace Polyjam2023
         private void OnFieldCleared()
         {
             var newFloatingText = Instantiate(floatingTextPrefab);
-            newFloatingText.AssignParent(playerUnitWidgetsContainer);
+            newFloatingText.AttachTo(playerUnitWidgetsContainer);
             newFloatingText.SetText("Field cleared");
             newFloatingText.gameObject.SetActive(false);
             
@@ -136,7 +136,7 @@ namespace Polyjam2023
             (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets).Add(newUnitWidget);
             var newFloatingText = Instantiate(floatingTextPrefab);
             newFloatingText.SetText("Unit spawned");
-            newFloatingText.AssignParent(newUnitWidget.transform);
+            newFloatingText.AttachTo(newUnitWidget.RectTransform);
             newFloatingText.gameObject.SetActive(false);
             newUnitWidget.gameObject.SetActive(false);
             
@@ -156,13 +156,14 @@ namespace Polyjam2023
         {
             var unitWidget = (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets)
                                 .FirstOrDefault(widget => widget.UnitInstance == unitInstance);
-            var newFloatingText = Instantiate(floatingTextPrefab, unitWidget.transform);
+            var newFloatingText = Instantiate(floatingTextPrefab);
             newFloatingText.SetText("Wounded");
             newFloatingText.gameObject.SetActive(false);
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>
                 {
                     newFloatingText.gameObject.SetActive(true);
+                    newFloatingText.AttachTo(unitWidget.RectTransform);
                 },
                 (float deltaTime) => { },
                 () => { unitWidget.SetPresentationData(gameplayManager.GameState.Field, unitInstance); },

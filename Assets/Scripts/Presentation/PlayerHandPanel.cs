@@ -110,7 +110,7 @@ namespace Polyjam2023
                     cardWidgets = cardWidgets.OrderBy(widget => widget.CardName).ToList();
                     cardWidgets.ForEach(cardWidget => cardWidget.transform.SetParent(cardWidgetsContainer));
                     
-                    newFloatingText.AssignParent(cardWidget.transform);
+                    newFloatingText.AttachTo(cardWidget.RectTransform);
                     newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
@@ -138,7 +138,7 @@ namespace Polyjam2023
                     else
                     {
                         cardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(entry.name), entry.quantity);
-                        newFloatingText.AssignParent(cardWidget.transform);
+                        newFloatingText.AttachTo(cardWidget.RectTransform);
                     }
                     newFloatingText.gameObject.SetActive(true);
                 },

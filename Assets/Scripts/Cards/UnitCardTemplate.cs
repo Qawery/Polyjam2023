@@ -10,7 +10,6 @@ namespace Polyjam2023
         [SerializeField, Range(1, 10)] private int initiative;
         [SerializeField, Range(1, 10)] private int health;
         
-        public override string EffectDescription => $"Unit";
         public Ownership Ownership => ownership;
         public int Attack => attack;
         public int Initiative => initiative;

@@ -26,7 +26,6 @@ namespace Polyjam2023
                 Assert.IsNotNull(cardTemplate, $"Null {nameof(cardTemplate)} in {nameof(cardTemplateLibrary)}.");
                 Assert.IsFalse(string.IsNullOrEmpty(cardTemplate.CardName), $"Null or empty {nameof(cardTemplate.CardName)} in {nameof(cardTemplate)}.");
                 Assert.IsNotNull(cardTemplate.Image, $"Null {nameof(cardTemplate.Image)} on {nameof(cardTemplate)}.");
-                Assert.IsFalse(string.IsNullOrEmpty(cardTemplate.EffectDescription), $"Null or empty {nameof(cardTemplate.EffectDescription)} in {nameof(cardTemplate)}.");
                 Assert.IsFalse(cardTemplatesByName.ContainsKey(cardTemplate.CardName), $"Duplicate card name <{cardTemplate.CardName}> in library.");
                 cardTemplatesByName.Add(cardTemplate.CardName, cardTemplate);
             }

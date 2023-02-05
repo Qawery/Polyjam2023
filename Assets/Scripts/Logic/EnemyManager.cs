@@ -1,11 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace Polyjam2023
 {
     public class EnemyManager
     {
+        private readonly (int elapsedCards, int minReinforcements, int maxReinforcements)[] deckPhases =
+        {
+            (3, 1, 2),
+            (5, 2, 4),
+            (10, 2, 5),
+            (10, 3, 5),
+            (10, 4, 6)
+        };
         private CardLibrary cardLibrary;
         private const int ReinforcementsTime = 2;
         private int reinforcementsTimer = ReinforcementsTime;
@@ -23,14 +31,14 @@ namespace Polyjam2023
             var partialDeck = new List<string>
             {
                 RootOfEvilName, "Hulk", "Hulk", "Hulk", "Hulk",
-                "Nightmare", "Nightmare", "Nightmare", "Nightmare", "Nightmare"
+                "Nightmare", "Nightmare", "Nightmare", "Nightmare", "Boar"
             };
             Deck.ShuffleCardList(ref partialDeck);
             gameState.EnemyDeck.AddCards(partialDeck);
             
             partialDeck = new List<string>
             {
-                "Hulk", "Hulk", "Hulk", "Boar", "Boar",
+                "Hulk", "Hulk", "Hulk", "Behemoth", "Boar",
                 "Nightmare", "Nightmare", "Nightmare", "Boar", "Boar"
             };
             Deck.ShuffleCardList(ref partialDeck);
@@ -38,8 +46,22 @@ namespace Polyjam2023
             
             partialDeck = new List<string>
             {
-                "Boar", "Boar", "Boar", "Boar", "Boar",
-                "Boar", "Boar", "Boar", "Boar", "Boar"
+                "Boar", "Boar", "Hulk", "Hulk", "Hulk",
+                "Boar", "Boar", "Boar", "Nightmare", "Nightmare"
+            };
+            Deck.ShuffleCardList(ref partialDeck);
+            gameState.EnemyDeck.AddCards(partialDeck);
+            
+            partialDeck = new List<string>
+            {
+                "Boar", "Boar", "Spore Carrier", "Spore Carrier", "Infector"
+            };
+            Deck.ShuffleCardList(ref partialDeck);
+            gameState.EnemyDeck.AddCards(partialDeck);
+            
+            partialDeck = new List<string>
+            {
+                "Spore Carrier", "Boar", "Spore Carrier"
             };
             Deck.ShuffleCardList(ref partialDeck);
             gameState.EnemyDeck.AddCards(partialDeck);
@@ -62,21 +84,23 @@ namespace Polyjam2023
             
             if (!gameState.Field.EnemyUnitsPresent.Any() || reinforcementsTimer == 0)
             {
-                List<string> cardsToTake;
-                if (gameState.EnemyDeck.NumberOfCardsInDeck > totalCards * 2 / 3)
+                List<string> cardsToTake = null;
+                int cardElapsed = totalCards - gameState.EnemyDeck.NumberOfCardsInDeck;
+                foreach (var deckPhaseInfo in deckPhases)
                 {
-                    cardsToTake = gameState.EnemyDeck.TakeCards(Random.Range(1, 3));
+                    if (cardElapsed < deckPhaseInfo.elapsedCards)
+                    {
+                        cardsToTake = gameState.EnemyDeck.TakeCards(Random.Range(deckPhaseInfo.minReinforcements, deckPhaseInfo.maxReinforcements));
+                        break;
+                    }
+                     
+                    cardElapsed -= deckPhaseInfo.elapsedCards;
                 }
-                else if (gameState.EnemyDeck.NumberOfCardsInDeck > totalCards / 3)
+                if (cardsToTake == null)
                 {
-                    
-                    cardsToTake = gameState.EnemyDeck.TakeCards(Random.Range(2, 4));
+                    cardsToTake = gameState.EnemyDeck.TakeCards(4);
                 }
-                else
-                {
-                    cardsToTake = gameState.EnemyDeck.TakeCards(Random.Range(2, 5));
-                }
-                
+
                 for(int i = 0; i < cardsToTake.Count; ++i)
                 {
                     gameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate(cardsToTake[i]) as UnitCardTemplate));

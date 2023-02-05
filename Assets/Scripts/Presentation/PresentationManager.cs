@@ -12,7 +12,10 @@ namespace Polyjam2023
         private GameplayManager gameplayManager;
         private MenuPanelManager pauseMenu;
         private FloatingText floatingTextPrefab;
-        private bool IsBlocked => currentTask != null || ongoingTasks.Count > 0;
+
+        public System.Action OnBusyChanged;
+        
+        public bool IsBlocked => currentTask != null || ongoingTasks.Count > 0;
         
         private void Awake()
         {
@@ -30,7 +33,7 @@ namespace Polyjam2023
             gameplayManager.OnPlayerTurnStarted += () =>
             {
                 var newFloatingText = Instantiate(floatingTextPrefab);
-                newFloatingText.SetText("Player turn");
+                newFloatingText.SetText("Player phase");
                 newFloatingText.gameObject.SetActive(false);
                 AddPresentationTask(new PresentationTask
                 (() =>
@@ -46,7 +49,7 @@ namespace Polyjam2023
             gameplayManager.OnPlayerTurnEnded += () =>
             {
                 var newFloatingText = Instantiate(floatingTextPrefab);
-                newFloatingText.SetText("Enemy turn");
+                newFloatingText.SetText("Battle phase");
                 newFloatingText.gameObject.SetActive(false);
                 AddPresentationTask(new PresentationTask
                 (() =>
@@ -86,16 +89,19 @@ namespace Polyjam2023
                 currentTask = ongoingTasks[0];
                 ongoingTasks.RemoveAt(0);
                 currentTask.Start();
+                OnBusyChanged?.Invoke();
             }
             else
             {
                 currentTask = null;
+                OnBusyChanged?.Invoke();
             }
         }
 
         public void AddPresentationTask(PresentationTask presentationTask)
         {
             ongoingTasks.Add(presentationTask);
+            OnBusyChanged?.Invoke();
         }
 
         private void OnCardWidgetClicked(CardWidget cardWidget)

@@ -19,7 +19,7 @@ namespace Polyjam2023
             Assert.IsNotNull(text);
             defaultParent = FindObjectOfType<DependencyResolver>().DefaultFloatingTextParent;
             Assert.IsNotNull(defaultParent);
-            AssignParent(null);
+            AttachTo(null);
         }
 
         private void Update()
@@ -38,21 +38,7 @@ namespace Polyjam2023
             text = null;
         }
 
-        public void AssignParent(Transform parent)
-        {
-            if (parent != null)
-            {
-                transform.SetParent(parent);
-                transform.position = parent.position;
-            }
-            else
-            {
-                rectTransform.SetParent(defaultParent);
-                rectTransform.position = defaultParent.position;
-            }
-        }
-
-        public void AssignParent(RectTransform parent)
+        public void AttachTo(RectTransform parent)
         {
             if (parent != null)
             {

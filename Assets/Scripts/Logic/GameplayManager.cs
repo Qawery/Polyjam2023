@@ -25,39 +25,41 @@ namespace Polyjam2023
             
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             Assert.IsNotNull(gameSettings, $"Missing {nameof(gameSettings)} on {gameObject.name}.");
+            
+            //Hard difficulty (base)
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Riflemen", "Flame Soldier", "Scout"
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                "Rifleman", "Rifleman", "Flame Soldier", "Scout"
             });
+            
+            //Medium difficulty
             if (gameSettings.difficulty < Difficulty.Hard)
             {
-                GameState.playerHandLimit += 5;
+                GameState.playerHandLimit += 2;
                 GameState.PlayerDeck.AddCards(new List<string>
                 {
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout"
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout"
                 });
             }
+            
+            //Easy difficulty
             if (gameSettings.difficulty < Difficulty.Medium)
             {
-                GameState.playerHandLimit += 5;
+                GameState.playerHandLimit += 3;
                 GameState.PlayerDeck.AddCards(new List<string>
                 {
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
-                    "Riflemen", "Riflemen", "Flame Soldier", "Scout"
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout",
+                    "Rifleman", "Rifleman", "Flame Soldier", "Scout"
                 });
             }
             
@@ -96,7 +98,7 @@ namespace Polyjam2023
             if (cardsToDraw > 0)
             {
                 GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(cardsToDraw));
-                if (GameState.PlayerDeck.NumberOfCardsInDeck == 0)
+                if (GameState.PlayerHand.Cards.Sum(card => card.quantity) + GameState.PlayerDeck.NumberOfCardsInDeck == 0)
                 {
                     OnGameEnded?.Invoke(GameEndReason.DeckEnded);
                 }

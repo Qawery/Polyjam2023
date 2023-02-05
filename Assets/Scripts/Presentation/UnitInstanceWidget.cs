@@ -14,11 +14,13 @@ namespace Polyjam2023
         [SerializeField] private TMPro.TextMeshProUGUI healthValue;
         [SerializeField] private Button button;
         private UnitInstance unitInstance;
+        private RectTransform rectTransform;
 
         public static event System.Action<UnitInstanceWidget> OnUnitInstanceWidgetClicked;
         
         public UnitInstance UnitInstance => unitInstance;
         private ICardLocation CardLocation { get; set; }
+        public RectTransform RectTransform => rectTransform;
         
         private void Awake()
         {
@@ -31,6 +33,8 @@ namespace Polyjam2023
             Assert.IsNotNull(healthValue, $"Missing {nameof(healthValue)} on {gameObject.name}.");
             Assert.IsNotNull(button, $"Missing {nameof(button)} on {gameObject.name}.");
             button.onClick.AddListener(() => { OnUnitInstanceWidgetClicked?.Invoke(this); } );
+            rectTransform = gameObject.GetComponent<RectTransform>();
+            Assert.IsNotNull(rectTransform, $"Missing {nameof(rectTransform)} on {gameObject.name}.");
         }
 
         private void OnDestroy()
@@ -44,6 +48,7 @@ namespace Polyjam2023
             button.onClick.RemoveAllListeners();
             button = null;
             unitInstance = null;
+            rectTransform = null;
         }
 
         public void SetPresentationData(ICardLocation cardLocation, UnitInstance unitInstance)

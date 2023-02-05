@@ -9,7 +9,10 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 6640951047717441670, guid: 6d9c9f5e2d7122540944ab424a8a1f62, type: 3}
       propertyPath: m_text
-      value: ...
+      value: 'Goal of the game is to find and kill Root of Evil.
+
+        You lose
+        if you run out of cards in your deck and hand.'
       objectReference: {fileID: 0}
     - target: {fileID: 6887183581261194781, guid: 6d9c9f5e2d7122540944ab424a8a1f62, type: 3}
       propertyPath: m_Name

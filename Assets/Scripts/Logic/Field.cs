@@ -113,6 +113,13 @@ namespace Polyjam2023
                 while (playerAttackPotential > 0 && enemyUnitsPresent.Count > 0)
                 {
                     var targetEnemyUnit = enemyUnitsPresent[Random.Range(0, enemyUnitsPresent.Count)];
+                    if (targetEnemyUnit.UnitCardTemplate.CardName == EnemyManager.RootOfEvilName && 
+                        enemyUnitsPresent.Count > 1)
+                    {
+                        targetEnemyUnit = enemyUnitsPresent.First(enemy =>
+                            enemy.UnitCardTemplate.CardName != EnemyManager.RootOfEvilName);
+                    }
+                    
                     if (targetEnemyUnit.currentHealth <= playerAttackPotential)
                     {
                         playerAttackPotential -= targetEnemyUnit.currentHealth;
@@ -143,7 +150,6 @@ namespace Polyjam2023
                     playerUnitsPresent.Clear();
                 }
                 OnFieldCleared?.Invoke();
-                return;
             }
         }
     }

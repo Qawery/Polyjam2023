@@ -14,10 +14,11 @@ namespace Polyjam2023
     {
         [SerializeField] private string cardName;
         [SerializeField] private Sprite image;
+        [SerializeField] private string description;
         
         public string CardName => cardName;
         public Sprite Image => image;
-        public abstract string EffectDescription { get; }
+        public string EffectDescription => description;
         
         public abstract bool TryPlayCard(GameState gameState);
     }
