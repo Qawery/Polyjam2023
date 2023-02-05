@@ -9,6 +9,7 @@ namespace Polyjam2023
         private CardLibrary cardLibrary;
         private const int StartingCards = 5;
         private const int DrawCardsPerTurn = 2;
+        private bool bossKilled = false;
 
         public event System.Action<GameEndReason> OnGameEnded;
         
@@ -21,17 +22,23 @@ namespace Polyjam2023
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Test Card 1", "Fast Player Unit", "Slow Player Unit",
-                "Test Card 2", "Fast Player Unit", "Slow Player Unit",
-                "Test Card 3", "Fast Player Unit", "Slow Player Unit",
-                "Test Card 1", "Fast Player Unit", "Slow Player Unit",
-                "Test Card 2", "Fast Player Unit", "Slow Player Unit",
-                "Test Card 3", "Fast Player Unit", "Slow Player Unit"
+                "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Flame Soldier", "Scout"
             });
             GameState.PlayerDeck.Shuffle();
             
             GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(StartingCards));
-            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Enemy Unit") as UnitCardTemplate));
+            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
+            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Root of Evil") as UnitCardTemplate));
+            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
+            GameState.Field.OnUnitKilled += (unitInstance) =>
+            {
+                if (unitInstance.UnitCardTemplate.CardName == "Root of Evil")
+                {
+                    bossKilled = true;
+                }
+            };
         }
 
         private void OnDestroy()
@@ -50,9 +57,35 @@ namespace Polyjam2023
         public void EndPlayerTurn()
         {
             GameState.Field.ResolveFieldCombat();
+
+            if (bossKilled)
+            {
+                OnGameEnded?.Invoke(GameEndReason.Victory);
+                return;
+            }
             
             //Enemy turn.
-            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Enemy Unit") as UnitCardTemplate));
+            int roll = Random.Range(0, 6);
+            switch (roll)
+            {
+                case 0:
+                {
+                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
+                    break;
+                }
+                case 1:
+                case 2:
+                {
+                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Hulk") as UnitCardTemplate));
+                    break;
+                }
+                case 3:
+                case 4:
+                {
+                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Nightmare") as UnitCardTemplate));
+                    break;
+                }
+            }
             
             //Victory conditions.
             if (GameState.PlayerDeck.NumberOfCardsInDeck > 0)

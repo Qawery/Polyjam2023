@@ -138,7 +138,7 @@ namespace Polyjam2023
                     newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
-                () => { },
+                () => { unitWidget.SetPresentationData(gameplayManager.GameState.Field, unitInstance); },
                 () => newFloatingText == null
             ));
         }
