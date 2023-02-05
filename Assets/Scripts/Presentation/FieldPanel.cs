@@ -35,18 +35,17 @@ namespace Polyjam2023
             CleanupPresentWidgets(enemyUnitWidgetsContainer, ref enemyUnitWidgets);
             CleanupPresentWidgets(playerUnitWidgetsContainer, ref playerUnitWidgets);
 
+            gameplayManager.GameState.Field.OnFieldCleared += OnFieldCleared;
             gameplayManager.GameState.Field.OnUnitAdded += OnUnitAdded;
             gameplayManager.GameState.Field.OnUnitWounded += OnUnitWounded;
             gameplayManager.GameState.Field.OnUnitKilled += OnUnitKilled;
             
-            var enemyUnitsPresent = gameplayManager.GameState.Field.EnemyUnitsPresent;
-            OnUnitsChanged(ref enemyUnitsPresent, ref enemyUnitWidgetsContainer, ref enemyUnitWidgets);
-            var playerUnitsPresent = gameplayManager.GameState.Field.PlayerUnitsPresent;
-            OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
+            RefreshFieldData();
         }
 
         private void OnDestroy()
         {
+            gameplayManager.GameState.Field.OnFieldCleared -= OnFieldCleared;
             gameplayManager.GameState.Field.OnUnitAdded -= OnUnitAdded;
             gameplayManager.GameState.Field.OnUnitWounded -= OnUnitWounded;
             gameplayManager.GameState.Field.OnUnitKilled -= OnUnitKilled;
@@ -60,6 +59,33 @@ namespace Polyjam2023
             playerUnitWidgetsContainer = null;
             enemyUnitWidgets.Clear();
             playerUnitWidgets.Clear();
+        }
+
+        private void RefreshFieldData()
+        {
+            var enemyUnitsPresent = gameplayManager.GameState.Field.EnemyUnitsPresent;
+            OnUnitsChanged(ref enemyUnitsPresent, ref enemyUnitWidgetsContainer, ref enemyUnitWidgets);
+            var playerUnitsPresent = gameplayManager.GameState.Field.PlayerUnitsPresent;
+            OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
+        }
+        
+        private void OnFieldCleared()
+        {
+            var newFloatingText = Instantiate(floatingTextPrefab);
+            newFloatingText.AssignParent(playerUnitWidgetsContainer);
+            newFloatingText.SetText("Field cleared");
+            newFloatingText.gameObject.SetActive(false);
+            
+            presentationManager.AddPresentationTask(new PresentationTask
+            (() =>
+                {
+                    RefreshFieldData();
+                    newFloatingText.gameObject.SetActive(true);
+                },
+                (float deltaTime) => { },
+                () => { },
+                () => newFloatingText == null
+            ));
         }
 
         private void CleanupPresentWidgets(RectTransform widgetContainer, ref List<UnitInstanceWidget> widgetCollection)
@@ -108,10 +134,11 @@ namespace Polyjam2023
                                                                 playerUnitWidgetsContainer : enemyUnitWidgetsContainer);
             newUnitWidget.SetPresentationData(gameplayManager.GameState.Field, unitInstance);
             (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets).Add(newUnitWidget);
-            var newFloatingText = Instantiate(floatingTextPrefab, newUnitWidget.transform);
+            var newFloatingText = Instantiate(floatingTextPrefab);
             newFloatingText.SetText("Unit spawned");
-            newUnitWidget.gameObject.SetActive(false);
+            newFloatingText.AssignParent(newUnitWidget.transform);
             newFloatingText.gameObject.SetActive(false);
+            newUnitWidget.gameObject.SetActive(false);
             
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>

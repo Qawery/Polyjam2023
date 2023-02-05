@@ -6,9 +6,10 @@ namespace Polyjam2023
     public class FloatingText : MonoBehaviour
     {
         private RectTransform rectTransform;
+        private RectTransform defaultParent;
         private TMPro.TextMeshProUGUI text;
-        private float lifeTime = 1.0f;
-        private const float speed = 20.0f;
+        private float lifeTime = 0.75f;
+        private const float speed = 40.0f;
 
         private void Awake()
         {
@@ -16,6 +17,9 @@ namespace Polyjam2023
             Assert.IsNotNull(rectTransform);
             text = GetComponent<TMPro.TextMeshProUGUI>();
             Assert.IsNotNull(text);
+            defaultParent = FindObjectOfType<DependencyResolver>().DefaultFloatingTextParent;
+            Assert.IsNotNull(defaultParent);
+            AssignParent(null);
         }
 
         private void Update()
@@ -34,6 +38,34 @@ namespace Polyjam2023
             text = null;
         }
 
+        public void AssignParent(Transform parent)
+        {
+            if (parent != null)
+            {
+                transform.SetParent(parent);
+                transform.position = parent.position;
+            }
+            else
+            {
+                rectTransform.SetParent(defaultParent);
+                rectTransform.position = defaultParent.position;
+            }
+        }
+
+        public void AssignParent(RectTransform parent)
+        {
+            if (parent != null)
+            {
+                rectTransform.SetParent(parent);
+                rectTransform.position = parent.position;
+            }
+            else
+            {
+                rectTransform.SetParent(defaultParent);
+                rectTransform.position = defaultParent.position;
+            }
+        }
+        
         public void SetText(string text)
         {
             this.text.text = text;

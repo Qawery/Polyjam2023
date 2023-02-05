@@ -9,6 +9,7 @@ namespace Polyjam2023
         private List<UnitInstance> enemyUnitsPresent  = new ();
         private List<UnitInstance> playerUnitsPresent  = new ();
 
+        public event System.Action OnFieldCleared;
         public event System.Action<UnitInstance> OnUnitAdded;
         public event System.Action<UnitInstance> OnUnitWounded;
         public event System.Action<UnitInstance> OnUnitKilled;
@@ -133,6 +134,16 @@ namespace Polyjam2023
                 {
                     break;
                 }
+            }
+            
+            if (enemyUnitsPresent.Count == 0)
+            {
+                if (playerUnitsPresent.Count > 0)
+                {
+                    playerUnitsPresent.Clear();
+                }
+                OnFieldCleared?.Invoke();
+                return;
             }
         }
     }

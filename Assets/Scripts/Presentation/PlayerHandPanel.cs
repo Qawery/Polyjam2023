@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,6 +14,7 @@ namespace Polyjam2023
         private GameplayManager gameplayManager;
         private CardWidget cardWidgetPrefab;
         [SerializeField] private RectTransform cardWidgetsContainer;
+        [SerializeField] private TMPro.TextMeshProUGUI cardLimitText;
         private List<CardWidget> cardWidgets = new();
 
         private void Awake()
@@ -30,6 +32,7 @@ namespace Polyjam2023
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");
             Assert.IsNotNull(cardWidgetPrefab, $"Missing {nameof(cardWidgetPrefab)} on {gameObject.name}.");
             Assert.IsNotNull(cardWidgetsContainer, $"Missing {nameof(cardWidgetsContainer)} on {gameObject.name}.");
+            Assert.IsNotNull(cardLimitText, $"Missing {nameof(cardLimitText)} on {gameObject.name}.");
 
             int childIndex = 0;
             for (; childIndex < cardWidgetsContainer.childCount;)
@@ -79,6 +82,7 @@ namespace Polyjam2023
             gameplayManager = null;
             cardWidgetPrefab = null;
             cardWidgetsContainer = null;
+            cardLimitText = null;
             cardWidgets.Clear();
         }
 
@@ -106,12 +110,11 @@ namespace Polyjam2023
                     cardWidgets = cardWidgets.OrderBy(widget => widget.CardName).ToList();
                     cardWidgets.ForEach(cardWidget => cardWidget.transform.SetParent(cardWidgetsContainer));
                     
-                    newFloatingText.transform.SetParent(cardWidget.transform);
-                    newFloatingText.transform.position = cardWidget.transform.position;
+                    newFloatingText.AssignParent(cardWidget.transform);
                     newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
-                () => { },
+                () => { UpdateCardLimitText(); },
                 () => newFloatingText == null
             ));
         }
@@ -135,15 +138,19 @@ namespace Polyjam2023
                     else
                     {
                         cardWidget.SetPresentationData(gameplayManager.GameState.PlayerHand, cardLibrary.GetCardTemplate(entry.name), entry.quantity);
-                        newFloatingText.transform.SetParent(cardWidget.transform);
-                        newFloatingText.transform.position = cardWidget.transform.position;
+                        newFloatingText.AssignParent(cardWidget.transform);
                     }
                     newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
-                () => { },
+                () => { UpdateCardLimitText(); },
                 () => newFloatingText == null
             ));
+        }
+
+        private void UpdateCardLimitText()
+        {
+            cardLimitText.text = $"{gameplayManager.GameState.PlayerHand.Cards.Sum(entry => entry.quantity).ToString()} / {gameplayManager.GameState.playerHandLimit.ToString()}";
         }
     }
 }

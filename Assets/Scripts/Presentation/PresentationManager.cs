@@ -11,7 +11,7 @@ namespace Polyjam2023
         
         private GameplayManager gameplayManager;
         private MenuPanelManager pauseMenu;
-
+        private FloatingText floatingTextPrefab;
         private bool IsBlocked => currentTask != null || ongoingTasks.Count > 0;
         
         private void Awake()
@@ -21,8 +21,43 @@ namespace Polyjam2023
             Assert.IsNotNull(gameplayManager);
             pauseMenu = dependencyResolver.PauseMenu;
             Assert.IsNotNull(pauseMenu);
+            floatingTextPrefab = dependencyResolver.FloatingTextPrefab;
+            Assert.IsNotNull(floatingTextPrefab);
+            
             CardWidget.OnCardWidgetClicked += OnCardWidgetClicked;
             UnitInstanceWidget.OnUnitInstanceWidgetClicked += OnUnitInstanceWidgetClicked;
+            
+            gameplayManager.OnPlayerTurnStarted += () =>
+            {
+                var newFloatingText = Instantiate(floatingTextPrefab);
+                newFloatingText.SetText("Player turn");
+                newFloatingText.gameObject.SetActive(false);
+                AddPresentationTask(new PresentationTask
+                (() =>
+                    {
+                        newFloatingText.gameObject.SetActive(true);
+                    },
+                    (float deltaTime) => { },
+                    () => { },
+                    () => newFloatingText == null
+                ));
+            };
+            
+            gameplayManager.OnPlayerTurnEnded += () =>
+            {
+                var newFloatingText = Instantiate(floatingTextPrefab);
+                newFloatingText.SetText("Enemy turn");
+                newFloatingText.gameObject.SetActive(false);
+                AddPresentationTask(new PresentationTask
+                (() =>
+                    {
+                        newFloatingText.gameObject.SetActive(true);
+                    },
+                    (float deltaTime) => { },
+                    () => { },
+                    () => newFloatingText == null
+                ));
+            };
         }
 
         private void OnDestroy()

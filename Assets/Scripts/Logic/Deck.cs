@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Polyjam2023
@@ -9,6 +10,7 @@ namespace Polyjam2023
 
         public event System.Action OnChanged;
         
+        public IReadOnlyList<string> Cards => cards.ToList();
         public int NumberOfCardsInDeck => cards.Count;
 
         public void AddCards(ICollection<string> cardsToAdd)
@@ -34,27 +36,28 @@ namespace Polyjam2023
 
         public void Shuffle()
         {
-            var cardList = new List<string>();
-            foreach(var card in cards)
-            {
-                cardList.Add(card);
-            }
+            var tempList = cards.ToList();
             cards.Clear();
-            
-            for (int i = 0; i < cardList.Count; ++i) 
+            ShuffleCardList(ref tempList);
+            foreach (var tempCard in tempList)
             {
-                var temp = cardList[i];
-                int randomIndex = Random.Range(i, cardList.Count);
-                cardList[i] = cardList[randomIndex];
-                cardList[randomIndex] = temp;
+                cards.Push(tempCard);
             }
-            
-            foreach(var card in cardList)
-            {
-                cards.Push(card);
-            }
-            
             OnChanged?.Invoke();
+        }
+
+        public static void ShuffleCardList(ref List<string> cardList)
+        {
+            var tempList = new List<string>();
+            tempList.AddRange(cardList);
+            cardList.Clear();
+
+            while (tempList.Count > 0)
+            {
+                int randomIndex = Random.Range(0, tempList.Count);
+                cardList.Add(tempList[randomIndex]);
+                tempList.RemoveAt(randomIndex);
+            }
         }
     }
 }

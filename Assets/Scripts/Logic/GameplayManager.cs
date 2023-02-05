@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -7,43 +8,71 @@ namespace Polyjam2023
     public class GameplayManager : MonoBehaviour
     {
         private CardLibrary cardLibrary;
-        private const int StartingCards = 5;
-        private const int DrawCardsPerTurn = 2;
-        private bool bossKilled = false;
+        private GameSettings gameSettings;
 
         public event System.Action<GameEndReason> OnGameEnded;
+        public event System.Action OnPlayerTurnEnded;
+        public event System.Action OnPlayerTurnStarted;
         
         public GameState GameState { get; private set; } = new ();
+        public EnemyManager EnemyManager { get; private set; } = new ();
 
         private void Awake()
         {
-            cardLibrary = FindObjectOfType<DependencyResolver>().CardLibrary;
+            var dependencyResolver = FindObjectOfType<DependencyResolver>();
+            cardLibrary = dependencyResolver.CardLibrary;
+            gameSettings = dependencyResolver.GameSettings;
             
             Assert.IsNotNull(cardLibrary, $"Missing {nameof(cardLibrary)} on {gameObject.name}.");
+            Assert.IsNotNull(gameSettings, $"Missing {nameof(gameSettings)} on {gameObject.name}.");
             GameState.PlayerDeck.AddCards(new List<string>
             {
-                "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Flame Soldier", "Scout",
-                "Riflemen", "Flame Soldier", "Scout"
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                "Riflemen", "Riflemen", "Flame Soldier", "Scout"
             });
-            GameState.PlayerDeck.Shuffle();
-            
-            GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(StartingCards));
-            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
-            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Root of Evil") as UnitCardTemplate));
-            GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
-            GameState.Field.OnUnitKilled += (unitInstance) =>
+            if (gameSettings.difficulty < Difficulty.Hard)
             {
-                if (unitInstance.UnitCardTemplate.CardName == "Root of Evil")
+                GameState.playerHandLimit += 5;
+                GameState.PlayerDeck.AddCards(new List<string>
                 {
-                    bossKilled = true;
-                }
-            };
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout"
+                });
+            }
+            if (gameSettings.difficulty < Difficulty.Medium)
+            {
+                GameState.playerHandLimit += 5;
+                GameState.PlayerDeck.AddCards(new List<string>
+                {
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout",
+                    "Riflemen", "Riflemen", "Flame Soldier", "Scout"
+                });
+            }
+            
+            GameState.PlayerDeck.Shuffle();
+            GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(GameState.playerHandLimit));
+
+            EnemyManager.InitializeEnemy(GameState, cardLibrary);
+            EnemyManager.OnBossKilled += () => { OnGameEnded?.Invoke(GameEndReason.Victory); };
         }
 
         private void OnDestroy()
         {
             cardLibrary = null;
+            gameSettings = null;
+            EnemyManager = null;
         }
 
         public void PlayPlayerCard(string cardName)
@@ -56,46 +85,24 @@ namespace Polyjam2023
 
         public void EndPlayerTurn()
         {
-            GameState.Field.ResolveFieldCombat();
-
-            if (bossKilled)
-            {
-                OnGameEnded?.Invoke(GameEndReason.Victory);
-                return;
-            }
+            OnPlayerTurnEnded?.Invoke();
             
-            //Enemy turn.
-            int roll = Random.Range(0, 6);
-            switch (roll)
-            {
-                case 0:
-                {
-                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Boar") as UnitCardTemplate));
-                    break;
-                }
-                case 1:
-                case 2:
-                {
-                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Hulk") as UnitCardTemplate));
-                    break;
-                }
-                case 3:
-                case 4:
-                {
-                    GameState.Field.AddUnit(new UnitInstance(cardLibrary.GetCardTemplate("Nightmare") as UnitCardTemplate));
-                    break;
-                }
-            }
+            GameState.Field.ResolveFieldCombat();
+            
+            EnemyManager.EnemyTurn(GameState);
             
             //Victory conditions.
-            if (GameState.PlayerDeck.NumberOfCardsInDeck > 0)
+            int cardsToDraw = GameState.playerHandLimit - GameState.PlayerHand.Cards.Sum(cardEntry => cardEntry.quantity);
+            if (cardsToDraw > 0)
             {
-                GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(DrawCardsPerTurn));
+                GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(cardsToDraw));
+                if (GameState.PlayerDeck.NumberOfCardsInDeck == 0)
+                {
+                    OnGameEnded?.Invoke(GameEndReason.DeckEnded);
+                }
             }
-            else
-            {
-                OnGameEnded?.Invoke(GameEndReason.DeckEnded);
-            }
+            
+            OnPlayerTurnStarted?.Invoke();
         }
     }
 }
