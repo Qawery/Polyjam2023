@@ -136,13 +136,13 @@ namespace Polyjam2023
             (unitInstance.UnitCardTemplate.Ownership == Ownership.Player ? playerUnitWidgets : enemyUnitWidgets).Add(newUnitWidget);
             var newFloatingText = Instantiate(floatingTextPrefab);
             newFloatingText.SetText("Unit spawned");
-            newFloatingText.AttachTo(newUnitWidget.RectTransform);
             newFloatingText.gameObject.SetActive(false);
             newUnitWidget.gameObject.SetActive(false);
             
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>
                 {
+                    newFloatingText.AttachTo(newUnitWidget.RectTransform);
                     newUnitWidget.gameObject.SetActive(true);
                     newFloatingText.gameObject.SetActive(true);
                 },
@@ -162,8 +162,8 @@ namespace Polyjam2023
             presentationManager.AddPresentationTask(new PresentationTask
             (() =>
                 {
-                    newFloatingText.gameObject.SetActive(true);
                     newFloatingText.AttachTo(unitWidget.RectTransform);
+                    newFloatingText.gameObject.SetActive(true);
                 },
                 (float deltaTime) => { },
                 () => { unitWidget.SetPresentationData(gameplayManager.GameState.Field, unitInstance); },
@@ -183,7 +183,6 @@ namespace Polyjam2023
                     if (unitInstance.UnitCardTemplate.Ownership == Ownership.Player)
                     {
                         var unitWidget = playerUnitWidgets.FirstOrDefault(widget => widget.UnitInstance == unitInstance);
-                        newFloatingText.transform.SetParent(playerUnitWidgetsContainer);
                         newFloatingText.transform.position = unitWidget.transform.position;
                         playerUnitWidgets.Remove(unitWidget);
                         Destroy(unitWidget.gameObject);
@@ -191,7 +190,6 @@ namespace Polyjam2023
                     else
                     {
                         var unitWidget = enemyUnitWidgets.FirstOrDefault(widget => widget.UnitInstance == unitInstance);
-                        newFloatingText.transform.SetParent(enemyUnitWidgetsContainer);
                         newFloatingText.transform.position = unitWidget.transform.position;
                         enemyUnitWidgets.Remove(unitWidget);
                         Destroy(unitWidget.gameObject);

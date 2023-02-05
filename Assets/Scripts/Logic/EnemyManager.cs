@@ -6,6 +6,9 @@ namespace Polyjam2023
 {
     public class EnemyManager
     {
+        private const int ReinforcementsTime = 2;
+        public const string RootOfEvilName = "Root of Evil";
+        
         private readonly (int elapsedCards, int minReinforcements, int maxReinforcements)[] deckPhases =
         {
             (3, 1, 2),
@@ -14,15 +17,15 @@ namespace Polyjam2023
             (10, 3, 5),
             (10, 4, 6)
         };
+        
         private CardLibrary cardLibrary;
-        private const int ReinforcementsTime = 2;
-        private int reinforcementsTimer = ReinforcementsTime;
         private int totalCards;
         private bool bossSpawned = false;
         
-        public const string RootOfEvilName = "Root of Evil";
-        
+        public System.Action OnReinforcementsTimerChanged;
         public System.Action OnBossKilled;
+
+        public int ReinforcementsTimer { get; private set; } = ReinforcementsTime;
         
         public void InitializeEnemy(GameState gameState, CardLibrary cardLibrary)
         {
@@ -82,7 +85,7 @@ namespace Polyjam2023
                 return;
             }
             
-            if (!gameState.Field.EnemyUnitsPresent.Any() || reinforcementsTimer == 0)
+            if (!gameState.Field.EnemyUnitsPresent.Any() || ReinforcementsTimer == 0)
             {
                 List<string> cardsToTake = null;
                 int cardElapsed = totalCards - gameState.EnemyDeck.NumberOfCardsInDeck;
@@ -110,11 +113,13 @@ namespace Polyjam2023
                         bossSpawned = true;
                     }
                 }
-                reinforcementsTimer = ReinforcementsTime;
+                ReinforcementsTimer = ReinforcementsTime;
+                OnReinforcementsTimerChanged?.Invoke();
             }
             else
             {
-                --reinforcementsTimer;
+                --ReinforcementsTimer;
+                OnReinforcementsTimerChanged?.Invoke();
             }
         }
     }
