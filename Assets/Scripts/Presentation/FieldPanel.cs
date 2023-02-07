@@ -35,7 +35,7 @@ namespace Polyjam2023
             CleanupPresentWidgets(enemyUnitWidgetsContainer, ref enemyUnitWidgets);
             CleanupPresentWidgets(playerUnitWidgetsContainer, ref playerUnitWidgets);
 
-            gameplayManager.GameState.Field.OnFieldCleared += OnFieldCleared;
+            gameplayManager.GameState.Field.OnWrathOfTheForest += OnWrathOfTheForest;
             gameplayManager.GameState.Field.OnUnitAdded += OnUnitAdded;
             gameplayManager.GameState.Field.OnUnitWounded += OnUnitWounded;
             gameplayManager.GameState.Field.OnUnitKilled += OnUnitKilled;
@@ -45,7 +45,7 @@ namespace Polyjam2023
 
         private void OnDestroy()
         {
-            gameplayManager.GameState.Field.OnFieldCleared -= OnFieldCleared;
+            gameplayManager.GameState.Field.OnWrathOfTheForest -= OnWrathOfTheForest;
             gameplayManager.GameState.Field.OnUnitAdded -= OnUnitAdded;
             gameplayManager.GameState.Field.OnUnitWounded -= OnUnitWounded;
             gameplayManager.GameState.Field.OnUnitKilled -= OnUnitKilled;
@@ -69,11 +69,11 @@ namespace Polyjam2023
             OnUnitsChanged(ref playerUnitsPresent, ref playerUnitWidgetsContainer, ref playerUnitWidgets);
         }
         
-        private void OnFieldCleared()
+        private void OnWrathOfTheForest()
         {
             var newFloatingText = Instantiate(floatingTextPrefab);
             newFloatingText.AttachTo(playerUnitWidgetsContainer);
-            newFloatingText.SetText("Field cleared");
+            newFloatingText.SetText("Wrath of the forest");
             newFloatingText.gameObject.SetActive(false);
             
             presentationManager.AddPresentationTask(new PresentationTask

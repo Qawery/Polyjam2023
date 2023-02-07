@@ -19,15 +19,18 @@ namespace Polyjam2023
 
         private void OnDisable()
         {
-            gameplayManager.EnemyManager.OnReinforcementsTimerChanged -= OnReinforcementsTimerChanged;
+            if (gameplayManager?.EnemyManager != null)
+            {
+                gameplayManager.EnemyManager.OnReinforcementsTimerChanged -= OnReinforcementsTimerChanged;
+            }
             gameplayManager = null;
             text = null;
         }
 
         private void OnReinforcementsTimerChanged()
         {
-            gameObject.SetActive(gameplayManager.GameState.EnemyDeck.NumberOfCardsInDeck > 0);
             text.text = $"New enemies in: {gameplayManager.EnemyManager.ReinforcementsTimer}";
+            gameObject.SetActive(!gameplayManager.EnemyManager.BossSpawned && gameplayManager.GameState.EnemyDeck.NumberOfCardsInDeck > 0);
         }
     }
 }

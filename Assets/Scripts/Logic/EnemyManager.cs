@@ -20,11 +20,11 @@ namespace Polyjam2023
         
         private CardLibrary cardLibrary;
         private int totalCards;
-        private bool bossSpawned = false;
         
         public System.Action OnReinforcementsTimerChanged;
         public System.Action OnBossKilled;
 
+        public bool BossSpawned { get; private set; }= false;
         public int ReinforcementsTimer { get; private set; } = ReinforcementsTime;
         
         public void InitializeEnemy(GameState gameState, CardLibrary cardLibrary)
@@ -79,25 +79,25 @@ namespace Polyjam2023
         
         public void EnemyTurn(GameState gameState)
         {
-            if (bossSpawned && !gameState.Field.EnemyUnitsPresent.Any(unitPresent => unitPresent.UnitCardTemplate.CardName == RootOfEvilName))
+            if (BossSpawned && gameState.Field.EnemyUnitsPresent.All(unitPresent => unitPresent.UnitCardTemplate.CardName != RootOfEvilName))
             {
                 OnBossKilled?.Invoke();
                 return;
             }
             
-            if (!gameState.Field.EnemyUnitsPresent.Any() || ReinforcementsTimer == 0)
+            if (!gameState.Field.EnemyUnitsPresent.Any() || ReinforcementsTimer == 0 || BossSpawned)
             {
                 List<string> cardsToTake = null;
-                int cardElapsed = totalCards - gameState.EnemyDeck.NumberOfCardsInDeck;
+                int cardsElapsed = totalCards - gameState.EnemyDeck.NumberOfCardsInDeck;
                 foreach (var deckPhaseInfo in deckPhases)
                 {
-                    if (cardElapsed < deckPhaseInfo.elapsedCards)
+                    if (cardsElapsed < deckPhaseInfo.elapsedCards)
                     {
                         cardsToTake = gameState.EnemyDeck.TakeCards(Random.Range(deckPhaseInfo.minReinforcements, deckPhaseInfo.maxReinforcements));
                         break;
                     }
                      
-                    cardElapsed -= deckPhaseInfo.elapsedCards;
+                    cardsElapsed -= deckPhaseInfo.elapsedCards;
                 }
                 if (cardsToTake == null)
                 {
@@ -110,7 +110,8 @@ namespace Polyjam2023
                     if (cardsToTake[i] == RootOfEvilName)
                     {
                         cardsToTake.AddRange(gameState.EnemyDeck.TakeCards(2));
-                        bossSpawned = true;
+                        BossSpawned = true;
+                        gameState.Field.WrathOfTheForestEnabled = false;
                     }
                 }
                 ReinforcementsTimer = ReinforcementsTime;

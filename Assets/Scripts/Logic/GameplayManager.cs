@@ -14,8 +14,8 @@ namespace Polyjam2023
         public event System.Action OnPlayerTurnEnded;
         public event System.Action OnPlayerTurnStarted;
         
-        public GameState GameState { get; private set; } = new ();
         public EnemyManager EnemyManager { get; private set; } = new ();
+        public GameState GameState { get; private set; } = new ();
 
         private void Awake()
         {
@@ -93,16 +93,16 @@ namespace Polyjam2023
             
             EnemyManager.EnemyTurn(GameState);
             
-            //Victory conditions.
-            GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(GameState.playerHandLimit - GameState.PlayerHand.Cards.Sum(cardEntry => cardEntry.quantity)));
-            
+            //Defeat conditions.
             if (GameState.PlayerHand.Cards.Sum(card => card.quantity) == 0 && 
                 GameState.PlayerDeck.NumberOfCardsInDeck == 0 && 
                 GameState.Field.PlayerUnitsPresent.Count == 0)
             {
                 OnGameEnded?.Invoke(GameEndReason.DeckEnded);
+                return;
             }
             
+            GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(GameState.playerHandLimit - GameState.PlayerHand.Cards.Sum(cardEntry => cardEntry.quantity)));
             OnPlayerTurnStarted?.Invoke();
         }
     }

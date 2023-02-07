@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace Polyjam2023
 {
@@ -9,14 +9,15 @@ namespace Polyjam2023
         private List<UnitInstance> enemyUnitsPresent  = new ();
         private List<UnitInstance> playerUnitsPresent  = new ();
 
-        public event System.Action OnFieldCleared;
+        public event System.Action OnWrathOfTheForest;
         public event System.Action<UnitInstance> OnUnitAdded;
         public event System.Action<UnitInstance> OnUnitWounded;
         public event System.Action<UnitInstance> OnUnitKilled;
 
+        public bool WrathOfTheForestEnabled = true;
         public IReadOnlyList<UnitInstance> EnemyUnitsPresent => enemyUnitsPresent;
         public IReadOnlyList<UnitInstance> PlayerUnitsPresent => playerUnitsPresent;
-
+        
         public void AddUnit(UnitInstance newUnitInstance)
         {
             if (newUnitInstance.UnitCardTemplate.Ownership == Ownership.Enemy)
@@ -113,7 +114,7 @@ namespace Polyjam2023
                 while (playerAttackPotential > 0 && enemyUnitsPresent.Count > 0)
                 {
                     var targetEnemyUnit = enemyUnitsPresent.FirstOrDefault(enemy => enemy.UnitCardTemplate.CardName != EnemyManager.RootOfEvilName) ??
-                                          enemyUnitsPresent.FirstOrDefault();
+                                          enemyUnitsPresent.First();
 
                     if (targetEnemyUnit.currentHealth <= playerAttackPotential)
                     {
@@ -138,13 +139,12 @@ namespace Polyjam2023
                 }
             }
             
-            if (enemyUnitsPresent.Count == 0)
+            if (WrathOfTheForestEnabled && 
+                enemyUnitsPresent.Count == 0 && 
+                playerUnitsPresent.Count > 0)
             {
-                if (playerUnitsPresent.Count > 0)
-                {
-                    playerUnitsPresent.Clear();
-                }
-                OnFieldCleared?.Invoke();
+                playerUnitsPresent.Clear();
+                OnWrathOfTheForest?.Invoke();
             }
         }
     }

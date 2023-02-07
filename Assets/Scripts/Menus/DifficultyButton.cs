@@ -19,13 +19,20 @@ namespace Polyjam2023
             button.onClick.AddListener(() =>
             {
                 gameSettings.difficulty = (Difficulty) (((int) gameSettings.difficulty + 1) % Enum.GetValues(typeof(Difficulty)).Length);
-                text.text = $"Difficulty:\n{gameSettings.difficulty.ToString()}";
+                UpdateText();
             });
+            UpdateText();
+        }
+
+        private void UpdateText()
+        {
+            text.text = $"Difficulty:\n{gameSettings.difficulty.ToString()}";
         }
 
         private void OnDestroy()
         {
             gameSettings = null;
+            text = null;
         }
     }
 }
