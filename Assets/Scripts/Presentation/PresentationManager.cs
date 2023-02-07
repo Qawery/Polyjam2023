@@ -49,7 +49,7 @@ namespace Polyjam2023
             gameplayManager.OnPlayerTurnEnded += () =>
             {
                 var newFloatingText = Instantiate(floatingTextPrefab);
-                newFloatingText.SetText("Battle phase");
+                newFloatingText.SetText("Combat phase");
                 newFloatingText.gameObject.SetActive(false);
                 AddPresentationTask(new PresentationTask
                 (() =>
