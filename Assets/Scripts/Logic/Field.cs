@@ -112,10 +112,9 @@ namespace Polyjam2023
                 #region WoundingEnemyUnits
                 while (playerAttackPotential > 0 && enemyUnitsPresent.Count > 0)
                 {
-                    var targetEnemyUnit = enemyUnitsPresent.Count > 1 ? 
-                        enemyUnitsPresent.First(enemy => enemy.UnitCardTemplate.CardName != EnemyManager.RootOfEvilName) : 
-                        enemyUnitsPresent.First();
-                    
+                    var targetEnemyUnit = enemyUnitsPresent.FirstOrDefault(enemy => enemy.UnitCardTemplate.CardName != EnemyManager.RootOfEvilName) ??
+                                          enemyUnitsPresent.FirstOrDefault();
+
                     if (targetEnemyUnit.currentHealth <= playerAttackPotential)
                     {
                         playerAttackPotential -= targetEnemyUnit.currentHealth;

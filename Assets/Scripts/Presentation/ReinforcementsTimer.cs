@@ -8,7 +8,7 @@ namespace Polyjam2023
         [SerializeField] private TMPro.TextMeshProUGUI text;
         private GameplayManager gameplayManager;
         
-        private void Start()
+        private void OnEnable()
         {
             Assert.IsNotNull(text);
             gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
@@ -17,7 +17,7 @@ namespace Polyjam2023
             OnReinforcementsTimerChanged();
         }
 
-        private void OnDestroy()
+        private void OnDisable()
         {
             gameplayManager.EnemyManager.OnReinforcementsTimerChanged -= OnReinforcementsTimerChanged;
             gameplayManager = null;

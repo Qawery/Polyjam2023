@@ -41,7 +41,7 @@ namespace Polyjam2023
             //Medium difficulty
             if (gameSettings.difficulty < Difficulty.Hard)
             {
-                GameState.playerHandLimit += 2;
+                GameState.playerHandLimit += 3;
                 GameState.PlayerDeck.AddCards(new List<string>
                 {
                     "Rifleman", "Rifleman", "Flame Soldier", "Scout",
@@ -54,7 +54,7 @@ namespace Polyjam2023
             //Easy difficulty
             if (gameSettings.difficulty < Difficulty.Medium)
             {
-                GameState.playerHandLimit += 3;
+                GameState.playerHandLimit += 2;
                 GameState.PlayerDeck.AddCards(new List<string>
                 {
                     "Rifleman", "Rifleman", "Flame Soldier", "Scout",
@@ -94,14 +94,13 @@ namespace Polyjam2023
             EnemyManager.EnemyTurn(GameState);
             
             //Victory conditions.
-            int cardsToDraw = GameState.playerHandLimit - GameState.PlayerHand.Cards.Sum(cardEntry => cardEntry.quantity);
-            if (cardsToDraw > 0)
+            GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(GameState.playerHandLimit - GameState.PlayerHand.Cards.Sum(cardEntry => cardEntry.quantity)));
+            
+            if (GameState.PlayerHand.Cards.Sum(card => card.quantity) == 0 && 
+                GameState.PlayerDeck.NumberOfCardsInDeck == 0 && 
+                GameState.Field.PlayerUnitsPresent.Count == 0)
             {
-                GameState.PlayerHand.AddCards(GameState.PlayerDeck.TakeCards(cardsToDraw));
-                if (GameState.PlayerHand.Cards.Sum(card => card.quantity) + GameState.PlayerDeck.NumberOfCardsInDeck == 0)
-                {
-                    OnGameEnded?.Invoke(GameEndReason.DeckEnded);
-                }
+                OnGameEnded?.Invoke(GameEndReason.DeckEnded);
             }
             
             OnPlayerTurnStarted?.Invoke();

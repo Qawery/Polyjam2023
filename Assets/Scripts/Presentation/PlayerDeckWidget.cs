@@ -12,7 +12,7 @@ namespace Polyjam2023
         [SerializeField] private Sprite cardsPresentImage;
         [SerializeField] private Sprite cardsAbsentImage;
         
-        private void Awake()
+        private void Start()
         {
             gameplayManager = FindObjectOfType<DependencyResolver>().GameplayManager;
             Assert.IsNotNull(gameplayManager, $"Missing {nameof(gameplayManager)} on {gameObject.name}.");

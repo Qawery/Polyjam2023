@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,7 +16,7 @@ namespace Polyjam2023
         [SerializeField] private TMPro.TextMeshProUGUI cardLimitText;
         private List<CardWidget> cardWidgets = new();
 
-        private void Awake()
+        private void Start()
         {
             var dependencyResolver = FindObjectOfType<DependencyResolver>();
             presentationManager = dependencyResolver.PresentationManager;
@@ -70,6 +69,7 @@ namespace Polyjam2023
             
             gameplayManager.GameState.PlayerHand.OnCardAdded += OnCardAdded;
             gameplayManager.GameState.PlayerHand.OnCardRemoved += OnCardRemoved;
+            UpdateCardLimitText();
         }
 
         private void OnDestroy()

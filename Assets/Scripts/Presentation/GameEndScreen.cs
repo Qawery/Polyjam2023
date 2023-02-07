@@ -59,15 +59,13 @@ namespace Polyjam2023
                     {
                         case GameEndReason.DeckEnded:
                         {
-                            gameEndReasonText.text = "Defeat! \nDeck has run out of cards!";
-                            gameEndReasonText.color = Color.red;
+                            gameEndReasonText.text = "Defeat! \nAll soldiers have been lost!";
                             image.sprite = defeatSprite;
                             break;
                         }
                         case GameEndReason.Defeat:
                         {
                             gameEndReasonText.text = "Defeat!";
-                            gameEndReasonText.color = Color.red;
                             image.sprite = defeatSprite;
                             break;
                         }
